@@ -72,7 +72,7 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ## 🖐 상호작용 시스템
 
-![상호작용 프롬프트](Docs/images/interaction_prompt.jpg)
+![상호작용 프롬프트](Docs/images/interaction_prompt_2026-10-17.png)
 
 **문제** — 문과 소품 같은 오브젝트마다 상호작용 처리가 달라, 새 오브젝트를 일관된 방식으로 붙일 수 없었습니다.
 
