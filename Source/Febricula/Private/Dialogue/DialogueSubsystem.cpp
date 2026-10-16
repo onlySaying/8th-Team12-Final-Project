@@ -1625,3 +1625,45 @@ void UDialogueSubsystem::BroadcastDialogueLine(const FText& Speaker, const FText
 	}
 	OnDialogueLine.Broadcast(Speaker, Body);
 }
+
+#if !UE_BUILD_SHIPPING
+// [skydodo] 2026-10-17 추가: 테스트용 콘솔 명령. 키 입력 없이 메인 NPC와 대화를 시작해 대화창을 확인한다
+// 사용: dialogue.TalkNpc [NpcId]  (NpcId를 빼면 플레이어와 가장 가까운 메인 NPC)
+static FAutoConsoleCommandWithWorldAndArgs GDialogueTalkNpcCommand(
+	TEXT("dialogue.TalkNpc"),
+	TEXT("dialogue.TalkNpc [NpcId] - 지정한 메인 NPC(없으면 가장 가까운 NPC)와 대화를 시작한다"),
+	FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>& Args, UWorld* World)
+	{
+		APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+		APawn* Player = PC ? PC->GetPawn() : nullptr;
+		if (!Player)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("dialogue.TalkNpc: 플레이어 폰이 없습니다. PIE 중에 실행하세요."));
+			return;
+		}
+
+		const FName WantedId = Args.Num() > 0 ? FName(*Args[0]) : NAME_None;
+		AMainNpcCharacter* Best = nullptr;
+		double BestDistSq = TNumericLimits<double>::Max();
+		for (TActorIterator<AMainNpcCharacter> It(World); It; ++It)
+		{
+			if (!WantedId.IsNone() && It->GetNpcId() != WantedId)
+			{
+				continue;
+			}
+			const double DistSq = FVector::DistSquared(It->GetActorLocation(), Player->GetActorLocation());
+			if (DistSq < BestDistSq)
+			{
+				BestDistSq = DistSq;
+				Best = *It;
+			}
+		}
+
+		if (!Best)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("dialogue.TalkNpc: 메인 NPC를 찾지 못했습니다 (%s)"), *WantedId.ToString());
+			return;
+		}
+		IInteractable::Execute_Interact(Best, Player);
+	}));
+#endif

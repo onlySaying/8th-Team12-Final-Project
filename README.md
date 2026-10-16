@@ -28,7 +28,7 @@
 
 | 영역 | 내용 |
 |---|---|
-| **대화 시스템** | 대사 출력 · 연출 서브시스템, 대화 · 조건 · 액션 데이터 모델, NPC 이벤트 선택 |
+| **대화 시스템** | 대사 출력 · 연출 서브시스템, 대화 · 조건 · 액션 데이터 모델, NPC 이벤트 선택, 대화 HUD |
 | **상호작용** | 인터페이스 + 컴포넌트 기반 상호작용 구조 |
 | **메인 NPC** | 스케줄 배치 스포너, 순찰 · 안내 Behavior Tree |
 | **군중 시스템** | 수백 명의 행인 이동 · 회피 · LOD, MassEntity 도입, 측정 기반 최적화 (−73%, −46%) |
@@ -63,6 +63,19 @@ for (const auto& Pair : EventTable->GetRowMap())
 Participants.AddUnique(NpcId);
 EnterTalkForParticipants(Participants, InInstigator);
 ```
+
+**대화 HUD** — `UPlayerHUDWidget`(C++)이 대화 서브시스템의 델리게이트를 받고, 화면 모양은 `WBP_PlayerHUD`가 맡습니다.
+- 프롬프트 · 대화창 · 선택지 · 초상화를 한 위젯의 레이어로 쌓아, 선택지가 대화창 뒤에 깔리는 문제를 막음
+- 반투명 둥근 카드 대화창, 이름표 태그(화자가 없으면 나레이션처럼 숨김), 다음 표시(▼)
+- 선택지는 조건(`FGameCondition`)을 만족하지 못하면 회색 · 클릭 불가로 표시 (위 이미지의 "잠긴 선택지")
+
+**테스트 도구**
+
+| 명령 · 데이터 | 용도 |
+|---|---|
+| `dialogue.TalkNpc [NpcId]` | 키 입력 없이 지정한(없으면 가장 가까운) 메인 NPC와 대화 시작 |
+| `DT_MiniGameTestEvents` · `DT_MiniGameTestDialogue` | 테스트 맵 전용 대화 → 선택지 → AP 소모까지 한 번에 확인 |
+| 테스트 맵 AP 보충 | `L_MiniGameTest`에서는 시간대와 상관없이 AP 3으로 시작 (Shipping 제외) |
 
 **트러블슈팅 — 주말이 지나면 날짜가 초기화돼 이벤트가 어긋남**
 - 원인: 주 단위 상대 날짜로 주말을 판정했고, 초기화되지 않은 값이 남아 있었음

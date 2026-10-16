@@ -7,9 +7,24 @@
 #include "Activity/ActivitySetting.h"
 #include "Dialogue/DialogueDataTypes.h"
 #include "Dialogue/DialogueSubsystem.h"
+#include "Engine/World.h"
 #include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "GameMode/TimeSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+
+#if !UE_BUILD_SHIPPING
+// [skydodo] 2026-10-17 추가: 미니게임 테스트 맵에서는 시간대와 상관없이 AP를 채워 둔다.
+// 기상 시간대 AP가 0이라 테스트 맵에서 AP 조건이 걸린 대화와 미니게임 문을 시험할 수 없었다.
+namespace
+{
+	constexpr int32 TestMapAP = 3;
+
+	bool IsMiniGameTestMap(const UWorld* World)
+	{
+		return World && UWorld::RemovePIEPrefix(World->GetOutermost()->GetName()) == TEXT("/Game/MiniGame/Maps/L_MiniGameTest");
+	}
+}
+#endif
 
 
 void UActivitySubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -55,6 +70,18 @@ void UActivitySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	
 	CurrentAP = 0;
 	MaxAP = 0;
+
+#if !UE_BUILD_SHIPPING
+	// PIE 시작 맵은 PostLoadMapWithWorld가 오지 않으므로 월드 액터 초기화 시점에 채운다
+	FWorldDelegates::OnWorldInitializedActors.AddWeakLambda(this, [this](const FActorsInitializedParams& Params)
+	{
+		if (IsMiniGameTestMap(Params.World) && CurrentAP < TestMapAP)
+		{
+			MaxAP = FMath::Max(MaxAP, TestMapAP);
+			CurrentAP = TestMapAP;
+		}
+	});
+#endif
 }
 
 
@@ -191,6 +218,13 @@ void UActivitySubsystem::OnChangeSchedule(FGameplayTag ChangedSchedule)
 		MaxAP = TimeSubsystem->GetNowScheduleAp();
 		CurrentAP = MaxAP;
 	}
+#if !UE_BUILD_SHIPPING
+	if (IsMiniGameTestMap(GetWorld()) && CurrentAP < TestMapAP)
+	{
+		MaxAP = FMath::Max(MaxAP, TestMapAP);
+		CurrentAP = TestMapAP;
+	}
+#endif
 	UE_LOG(LogTemp, Warning, TEXT("EventSubsystem: Detect Schedule Change"));
 	UE_LOG(LogTemp, Warning, TEXT("EventSubsystem: To %s"), *NowSchedule.ToString());
 	UE_LOG(LogTemp, Warning, TEXT("EventSubsystem: NowAp:  %d"), CurrentAP);
