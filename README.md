@@ -38,7 +38,7 @@
 
 ## 💬 대화 시스템
 
-![대화 이벤트](Docs/images/dialogue_event.png)
+![대화 이벤트](Docs/images/dialogue_hud_2026-10-17.png)
 
 `UDialogueSubsystem`(Tickable World Subsystem)이 게임의 모든 대사와 연출을 맡습니다. 화면에 대사를 띄우고 사운드와 연출을 실행합니다.
 
