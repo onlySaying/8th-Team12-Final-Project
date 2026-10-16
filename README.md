@@ -120,7 +120,7 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ## 🚶 군중 시스템 — 측정 기반 최적화
 
-![군중 시스템](Docs/images/crowd_overview.jpg)
+![군중 시스템](Docs/images/crowd_overview_2026-10-17.jpg)
 
 수백 명의 행인을 싸게 돌리는 설계. `USubNpcDirectorSubsystem`이 행인 전원의 이동 · 회피 · LOD를 한 곳에서 처리하고(Active/Pooled 풀), `ASubNpcCharacter`는 상태만 보유합니다.
 
@@ -138,7 +138,7 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 > RVO는 구현 비용을, 직접 만든 회피는 실행 비용을 아끼는 도구입니다. 수백 명 규모라 후자를 골랐습니다. ([비교 문서](Docs/RVO_회피_비교.md))
 
-![스팟 이벤트와 일행](Docs/images/crowd_spot_event.png)
+![스팟 이벤트와 일행](Docs/images/crowd_spot_event_2026-10-17.png)
 
 일행 중 한 명이 줄을 서서 이벤트를 하는 동안 나머지는 옆 대기 자리에서 기다렸다가 함께 길로 복귀합니다. 행동 결정은 Mass StateTree(`ST_Passerby`)로 이전했습니다.
 
@@ -165,7 +165,7 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ### 원경 인스턴싱과 Mass 병렬화 — 애니메이션 워커 −46%
 
-![원경 인스턴싱](Docs/images/crowd_far_instancing.png)
+![원경 인스턴싱](Docs/images/crowd_far_instancing_2026-10-17.png)
 
 40 m 밖 행인은 스켈레탈 메시를 숨겨 애니메이션 계산을 멈추고, 걷기 · 대기를 텍스처로 구운(AnimToTexture) 인스턴스드 메시 한 장으로 그립니다.
 
@@ -220,7 +220,7 @@ Mass 이동 병렬화(계산은 워커 스레드, 적용만 게임 스레드)는
 
 | 햄버거집 | 꽃집 | 편의점 |
 |---|---|---|
-| ![햄버거집](Docs/images/minigame_burger.png) | ![꽃집](Docs/images/minigame_flower.png) | ![편의점](Docs/images/minigame_convenience.png) |
+| ![햄버거집](Docs/images/minigame_burger_2026-10-17.png) | ![꽃집](Docs/images/minigame_flower.png) | ![편의점](Docs/images/minigame_convenience.png) |
 | 주문대로 쌓기 · 급여 + 손재주 | 같은 꽃 합치기 · 급여 + 체력 | 진상 손님 사이에서 버티기 · 급여 + 말솜씨 |
 
 ### 공통 프레임워크
