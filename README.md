@@ -99,7 +99,9 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ## 🧑‍🏫 메인 NPC — 스케줄 배치 · 순찰 AI
 
-[![메인 NPC 스케줄 스포너](Docs/images/mainnpc_spawner.png)](https://www.youtube.com/watch?v=vAi9IOcNppw)
+![메인 NPC 스케줄 배치 흐름](Docs/images/mainnpc_schedule_flow.svg)
+
+> ▶ 실제 동작은 [플레이 영상](https://www.youtube.com/watch?v=vAi9IOcNppw)에서 볼 수 있습니다.
 
 **스케줄 배치 스포너** — 기획자가 표(`FMainNpcSpawnRow`)만 고쳐서 "1일차 아침엔 교실, 신뢰 이상이면 옥상"을 정합니다.
 
