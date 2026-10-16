@@ -117,6 +117,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crowd|Spawner")
 	TSubclassOf<ASubNpcCharacter> NpcClass;
 
+	// [skydodo] 2026-10-17 추가
+	/** 섞어서 내보낼 행인 종류 (예: 남학생/여학생). 지정하면 Npc Class 대신 이 목록을 같은 수로 섞어 쓴다 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Crowd|Spawner")
+	TArray<TSubclassOf<ASubNpcCharacter>> NpcClassVariants;
+
 	/**
 	 * 미리 만들어둘 풀 크기. 목표 인원보다 넉넉해야 회수/재등장이 끊기지 않는다.
 	 * 이 값이 곧 메모리 상한이다 - 여기서 정한 만큼만 메타휴먼이 존재한다.

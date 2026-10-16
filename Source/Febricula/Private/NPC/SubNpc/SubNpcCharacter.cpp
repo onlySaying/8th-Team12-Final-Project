@@ -5,6 +5,7 @@
 #include "NPC/SubNpc/SubNpcCharacter.h"
 
 #include "Animation/CharacterAnimationComponent.h"
+#include "AnimToTextureDataAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Dialogue/DialogueSubsystem.h"
@@ -969,6 +970,17 @@ void ASubNpcCharacter::ApplyLodBand(ESubNpcLodBand NewBand)
 		MeshComp->SetComponentTickEnabled(false);
 		MeshComp->bPauseAnims = true;
 	}
+}
+
+UAnimToTextureDataAsset* ASubNpcCharacter::GetFarCrowdAnimData() const
+{
+	if (FarCrowdAnimData.IsNull())
+	{
+		return nullptr;
+	}
+	// 매 프레임 불리므로 이미 로드돼 있으면 바로 돌려준다
+	UAnimToTextureDataAsset* Loaded = FarCrowdAnimData.Get();
+	return Loaded ? Loaded : FarCrowdAnimData.LoadSynchronous();
 }
 
 void ASubNpcCharacter::SetInstancedRepresentation(bool bInstanced)

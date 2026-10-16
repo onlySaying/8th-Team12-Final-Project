@@ -280,3 +280,14 @@ AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까�
 | [`SubNpcDirectorSubsystem.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcDirectorSubsystem.cpp) | 군중 감독: 경로 이동, 회피, LOD |
 | [`SubNpcMassProcessors.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcMassProcessors.cpp) | Mass 이동 병렬화 · 원경 표현 프로세서 |
 | [`MiniGameSubsystem.cpp`](Source/Febricula/Private/MiniGame/MiniGameSubsystem.cpp) | 미니게임 공통 프레임워크 |
+
+---
+
+## 🎨 에셋 출처
+
+| 에셋 | 출처 | 라이선스 |
+|---|---|---|
+| 행인 남학생 | [Rigged Anime Japanese High School Boy](https://sketchfab.com/3d-models/845df0101cd5429e86b190be757d1365) — suzuart (Sketchfab) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| 행인 여학생 | [Stylized Anime Japanese High School Girl 6](https://sketchfab.com/3d-models/a9a4ea84dc7844d3bf5d870a1d59b061) — suzuart (Sketchfab) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+
+두 모델 모두 Mixamo로 리깅한 뒤 Manny 애니메이션을 IK 리타깃해 사용했습니다.

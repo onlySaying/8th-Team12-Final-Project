@@ -255,28 +255,32 @@ void UMassSubNpcRepresentationProcessor::ConfigureQueries(const TSharedRef<FMass
 	EntityQuery.AddRequirement<FSubNpcRepresentationFragment>(EMassFragmentAccess::ReadWrite);
 }
 
-ASubNpcFarCrowdInstancer* UMassSubNpcRepresentationProcessor::GetOrCreateInstancer(UWorld* World)
+UAnimToTextureDataAsset* UMassSubNpcRepresentationProcessor::GetDefaultAnimData(UWorld* World)
 {
-	if (ASubNpcFarCrowdInstancer* Existing = Instancer.Get())
+	if (!bDefaultLookedUp && World)
 	{
-		return Existing;
+		bDefaultLookedUp = true;
+		for (TActorIterator<ANpcCrowdSpawner> It(World); It; ++It)
+		{
+			DefaultAnimData = It->LoadFarCrowdAnimData();
+			break;
+		}
 	}
-	if (bInstancerUnavailable || !World)
-	{
-		return nullptr;
-	}
+	return DefaultAnimData.Get();
+}
 
-	UAnimToTextureDataAsset* AnimData = nullptr;
-	for (TActorIterator<ANpcCrowdSpawner> It(World); It; ++It)
+ASubNpcFarCrowdInstancer* UMassSubNpcRepresentationProcessor::GetOrCreateInstancer(UWorld* World, UAnimToTextureDataAsset* AnimData)
+{
+	if (!World || !AnimData || UnavailableData.Contains(AnimData))
 	{
-		AnimData = It->LoadFarCrowdAnimData();
-		break;
-	}
-	if (!AnimData)
-	{
-		bInstancerUnavailable = true;
-		SUBNPC_LOG(Log, TEXT("[Crowd] 원경 표현 데이터가 없어 멀리 있는 행인도 스켈레탈 메시로 그립니다 (스포너의 Far Crowd Anim Data)."));
 		return nullptr;
+	}
+	if (const TWeakObjectPtr<ASubNpcFarCrowdInstancer>* Found = Instancers.Find(AnimData))
+	{
+		if (ASubNpcFarCrowdInstancer* Existing = Found->Get())
+		{
+			return Existing;
+		}
 	}
 
 	FActorSpawnParameters Params;
@@ -288,10 +292,11 @@ ASubNpcFarCrowdInstancer* UMassSubNpcRepresentationProcessor::GetOrCreateInstanc
 		{
 			NewInstancer->Destroy();
 		}
-		bInstancerUnavailable = true;
+		UnavailableData.Add(AnimData);
+		SUBNPC_LOG(Log, TEXT("[Crowd] 원경 데이터 %s 를 쓸 수 없어 이 행인들은 멀리서도 스켈레탈 메시로 그립니다."), *GetNameSafe(AnimData));
 		return nullptr;
 	}
-	Instancer = NewInstancer;
+	Instancers.Add(AnimData, NewInstancer);
 	return NewInstancer;
 }
 
@@ -316,12 +321,12 @@ void UMassSubNpcRepresentationProcessor::Execute(FMassEntityManager& EntityManag
 	}
 
 	const bool bEnabled = GSubNpcFarInstances != 0 && bHasViewer;
-	ASubNpcFarCrowdInstancer* FarCrowd = bEnabled ? GetOrCreateInstancer(World) : Instancer.Get();
-	UInstancedStaticMeshComponent* Instances = FarCrowd ? FarCrowd->GetInstances() : nullptr;
-	if (!Instances)
+	// 꺼져 있고 빌려 간 칸도 없으면 할 일이 없다
+	if (!bEnabled && Instancers.Num() == 0)
 	{
 		return;
 	}
+	UAnimToTextureDataAsset* DefaultData = bEnabled ? GetDefaultAnimData(World) : nullptr;
 
 	const float EnterSq = FMath::Square(GSubNpcFarInstanceDistance);
 	const float LeaveSq = FMath::Square(FMath::Max(0.f, GSubNpcFarInstanceDistance - SubNpcFarCrowd::Hysteresis));
@@ -348,15 +353,26 @@ void UMassSubNpcRepresentationProcessor::Execute(FMassEntityManager& EntityManag
 
 			if (bWant && !bIsInstanced)
 			{
-				Rep.InstanceIndex = FarCrowd->AcquireSlot();
-				Rep.AnimIndex = -1;
-				Rep.TimeOffset = FMath::FRandRange(0.f, 10.f);
-				Npc->SetInstancedRepresentation(true);
+				// 행인 종류마다 원경 메시가 다를 수 있어, 그 행인의 데이터로 인스턴서를 고른다
+				UAnimToTextureDataAsset* NpcData = Npc->GetFarCrowdAnimData();
+				ASubNpcFarCrowdInstancer* Target = GetOrCreateInstancer(World, NpcData ? NpcData : DefaultData);
+				if (Target)
+				{
+					Rep.Instancer = Target;
+					Rep.InstanceIndex = Target->AcquireSlot();
+					Rep.AnimIndex = -1;
+					Rep.TimeOffset = FMath::FRandRange(0.f, 10.f);
+					Npc->SetInstancedRepresentation(true);
+				}
 			}
 			else if (!bWant && bIsInstanced)
 			{
-				FarCrowd->ReleaseSlot(Rep.InstanceIndex);
+				if (ASubNpcFarCrowdInstancer* Owner = Rep.Instancer.Get())
+				{
+					Owner->ReleaseSlot(Rep.InstanceIndex);
+				}
 				Rep.InstanceIndex = -1;
+				Rep.Instancer.Reset();
 				if (IsValid(Npc) && !Npc->IsPooled())
 				{
 					Npc->SetInstancedRepresentation(false);
@@ -364,7 +380,9 @@ void UMassSubNpcRepresentationProcessor::Execute(FMassEntityManager& EntityManag
 				bChanged = true;
 			}
 
-			if (Rep.InstanceIndex < 0)
+			ASubNpcFarCrowdInstancer* FarCrowd = Rep.Instancer.Get();
+			UInstancedStaticMeshComponent* Instances = FarCrowd ? FarCrowd->GetInstances() : nullptr;
+			if (Rep.InstanceIndex < 0 || !Instances)
 			{
 				continue;
 			}

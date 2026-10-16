@@ -58,7 +58,20 @@ void ANpcCrowdSpawner::BeginPlay()
 		return;
 	}
 
-	if (!NpcClass)
+	// [skydodo] 2026-10-17 추가: 행인 종류(남학생/여학생 등)를 섞어서 내보낸다. 비어 있으면 Npc Class 하나만 쓴다
+	TArray<TSubclassOf<ASubNpcCharacter>> Classes;
+	for (const TSubclassOf<ASubNpcCharacter>& Variant : NpcClassVariants)
+	{
+		if (Variant)
+		{
+			Classes.Add(Variant);
+		}
+	}
+	if (Classes.Num() == 0 && NpcClass)
+	{
+		Classes.Add(NpcClass);
+	}
+	if (Classes.Num() == 0)
 	{
 		SUBNPC_LOG(Warning,
 			TEXT("[Crowd] %s: Npc Class가 지정되지 않아 군중이 생성되지 않습니다."), *GetNameSafe(this));
@@ -69,7 +82,28 @@ void ANpcCrowdSpawner::BeginPlay()
 	Director->SetMaxActiveNpcs(FMath::Max(BaseTargetCount, PoolSize));
 
 	// 풀은 여기서 한 번만 만든다. 이후 런타임에는 액터가 새로 생기지 않는다.
-	Director->PrewarmPool(NpcClass, PoolSize);
+	// 종류가 여럿이면 같은 수만큼 만들고 순서를 섞는다 - 풀에서 꺼내는 순서가 곧 등장 순서라 몰려 나오지 않게 한다.
+	if (Classes.Num() == 1)
+	{
+		Director->PrewarmPool(Classes[0], PoolSize);
+	}
+	else
+	{
+		TArray<int32> Order;
+		Order.Reserve(PoolSize);
+		for (int32 i = 0; i < PoolSize; ++i)
+		{
+			Order.Add(i % Classes.Num());
+		}
+		for (int32 i = Order.Num() - 1; i > 0; --i)
+		{
+			Order.Swap(i, FMath::RandRange(0, i));
+		}
+		for (const int32 ClassIndex : Order)
+		{
+			Director->PrewarmPool(Classes[ClassIndex], 1);
+		}
+	}
 
 	// 입구 경로를 지정 안 했으면 레벨에서 자동으로 찾는다.
 	if (EntryPaths.Num() == 0)

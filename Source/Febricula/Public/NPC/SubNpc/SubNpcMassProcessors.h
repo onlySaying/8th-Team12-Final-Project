@@ -84,6 +84,8 @@ private:
 //   crowd.FarInstanceDistance 4000         이 거리(cm)보다 멀면 인스턴스로 그린다. 작은 맵에서 시험할 때 낮춘다
 // ---------------------------------------------------------------------------
 
+class ASubNpcFarCrowdInstancer;
+
 /** 이 엔티티가 원경 인스턴스로 그려지고 있으면 그 칸과 재생 중인 애니메이션 */
 USTRUCT()
 struct FSubNpcRepresentationFragment : public FMassFragment
@@ -98,10 +100,13 @@ struct FSubNpcRepresentationFragment : public FMassFragment
 
 	/** 사람마다 걸음 박자를 다르게 하는 시간 오프셋 (초). 다 같이 발을 맞추면 행진처럼 보인다 */
 	float TimeOffset = 0.f;
+
+	/** 칸을 빌린 인스턴서. 행인 종류마다 원경 메시가 달라 인스턴서가 여러 개일 수 있다 */
+	TWeakObjectPtr<ASubNpcFarCrowdInstancer> Instancer;
 };
 
 /**
- * 원경 행인을 그리는 인스턴스드 메시 하나를 들고 있는 액터. 월드에 하나, 처음 필요할 때 만든다.
+ * 원경 행인을 그리는 인스턴스드 메시 하나를 들고 있는 액터. 원경 데이터(행인 종류)마다 하나, 처음 필요할 때 만든다.
  * 칸은 지우지 않고 재사용한다 - 인스턴스를 지우면 뒤 칸 번호가 당겨져서 다른 사람 칸이 바뀐다.
  */
 UCLASS(Transient, NotPlaceable)
@@ -155,13 +160,20 @@ protected:
 	virtual void Execute(FMassEntityManager& EntityManager, FMassExecutionContext& Context) override;
 
 private:
-	/** 월드의 원경 인스턴서를 찾거나 만든다. 애니메이션 데이터를 못 읽으면 nullptr (원경 표현을 쓰지 않는다) */
-	ASubNpcFarCrowdInstancer* GetOrCreateInstancer(UWorld* World);
+	/** 이 데이터로 그리는 원경 인스턴서를 찾거나 만든다. 데이터를 쓸 수 없으면 nullptr (그 행인은 원경 표현을 쓰지 않는다) */
+	ASubNpcFarCrowdInstancer* GetOrCreateInstancer(UWorld* World, UAnimToTextureDataAsset* AnimData);
+
+	/** 행인이 원경 데이터를 따로 정하지 않았을 때 쓰는 스포너의 기본값 */
+	UAnimToTextureDataAsset* GetDefaultAnimData(UWorld* World);
 
 	FMassEntityQuery EntityQuery;
 
-	TWeakObjectPtr<ASubNpcFarCrowdInstancer> Instancer;
+	// [skydodo] 2026-10-17 수정: 인스턴서 하나 → 원경 데이터마다 하나 (행인 종류마다 메시가 다르다)
+	TMap<TWeakObjectPtr<UAnimToTextureDataAsset>, TWeakObjectPtr<ASubNpcFarCrowdInstancer>> Instancers;
 
-	/** 데이터를 못 읽었으면 매 프레임 다시 시도하지 않는다 */
-	bool bInstancerUnavailable = false;
+	/** 쓸 수 없는 데이터는 매 프레임 다시 시도하지 않는다 */
+	TSet<TWeakObjectPtr<UAnimToTextureDataAsset>> UnavailableData;
+
+	TWeakObjectPtr<UAnimToTextureDataAsset> DefaultAnimData;
+	bool bDefaultLookedUp = false;
 };

@@ -27,6 +27,7 @@
 
 class ANpcCrowdPath;
 class ANpcActivitySpot;
+class UAnimToTextureDataAsset;
 
 /**
  * 경로 이동 한 걸음의 계산 결과.
@@ -689,7 +690,15 @@ public:
 	/** 퇴장구에서 사라지는 중인가 (그동안은 인스턴스로 바꾸지 않는다 - 페이드가 보여야 한다) */
 	bool IsExitFading() const { return bExitFading; }
 
+	/** 원경 표현 데이터. 지정하지 않았으면 nullptr (스포너의 기본값을 쓴다) */
+	UAnimToTextureDataAsset* GetFarCrowdAnimData() const;
+
 protected:
+	// [skydodo] 2026-10-17 추가: 행인 종류(남학생/여학생 등)마다 메시가 달라 원경 데이터도 따로 둔다
+	/** 멀리 있을 때 그릴 원경 애니메이션 데이터. 비우면 스포너의 Far Crowd Anim Data를 쓴다 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SubNpc|FarCrowd")
+	TSoftObjectPtr<UAnimToTextureDataAsset> FarCrowdAnimData;
+
 	/** 이번 프레임에 이웃들이 밀어낸 양의 합 */
 	float PendingAvoidNudge = 0.f;
 
