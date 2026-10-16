@@ -266,3 +266,4 @@ AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까�
 | [`MainNpcSpawner.cpp`](Source/Febricula/Private/NPC/MainNpc/MainNpcSpawner.cpp) | 메인 NPC 스케줄 스포너 |
 | [`SubNpcDirectorSubsystem.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcDirectorSubsystem.cpp) | 군중 감독: 경로 이동, 회피, LOD |
 | [`SubNpcMassProcessors.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcMassProcessors.cpp) | Mass 이동 병렬화 · 원경 표현 프로세서 |
+| [`MiniGameSubsystem.cpp`](Source/Febricula/Private/MiniGame/MiniGameSubsystem.cpp) | 미니게임 공통 프레임워크 |
