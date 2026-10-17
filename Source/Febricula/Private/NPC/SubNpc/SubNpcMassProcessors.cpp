@@ -149,8 +149,13 @@ namespace SubNpcFarCrowd
 	/** 구운 걷기 애니메이션의 원래 걸음 속도 (cm/s). 행인 걸음 속도와의 비율로 재생 속도를 정한다 */
 	constexpr float BakedWalkSpeed = 150.f;
 
+	// [skydodo] 2026-10-17 버그 수정: 전역 static FTransform이 Live Coding 패치 모듈에서 초기화되지 않은 채(회전 0,0,0,0) 쓰여
+	// AddInstance의 IsRotationNormalized 검사에서 크래시. 쓸 때마다 만들어 돌려준다.
 	/** 쓰지 않는 칸을 치워 두는 자리. 크기 0이라 보이지 않는다 */
-	static const FTransform HiddenTransform(FQuat::Identity, FVector(0.f, 0.f, -100000.f), FVector::ZeroVector);
+	static FTransform HiddenTransform()
+	{
+		return FTransform(FQuat::Identity, FVector(0.f, 0.f, -100000.f), FVector::ZeroVector);
+	}
 }
 
 ASubNpcFarCrowdInstancer::ASubNpcFarCrowdInstancer()
@@ -225,7 +230,7 @@ int32 ASubNpcFarCrowdInstancer::AcquireSlot()
 	{
 		return FreeSlots.Pop(EAllowShrinking::No);
 	}
-	return Instances->AddInstance(SubNpcFarCrowd::HiddenTransform, /*bWorldSpace=*/true);
+	return Instances->AddInstance(SubNpcFarCrowd::HiddenTransform(), /*bWorldSpace=*/true);
 }
 
 void ASubNpcFarCrowdInstancer::ReleaseSlot(int32 Slot)
@@ -234,7 +239,7 @@ void ASubNpcFarCrowdInstancer::ReleaseSlot(int32 Slot)
 	{
 		return;
 	}
-	Instances->UpdateInstanceTransform(Slot, SubNpcFarCrowd::HiddenTransform, /*bWorldSpace=*/true, /*bMarkRenderStateDirty=*/false, /*bTeleport=*/true);
+	Instances->UpdateInstanceTransform(Slot, SubNpcFarCrowd::HiddenTransform(), /*bWorldSpace=*/true, /*bMarkRenderStateDirty=*/false, /*bTeleport=*/true);
 	FreeSlots.Add(Slot);
 }
 
