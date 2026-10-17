@@ -8,18 +8,19 @@
 
 ## 📖 게임 소개
 
-프로그래머 면허 제도가 시행된 근미래 대한민국. 플레이어는 소프트웨어 고등학교 3학년에 강제 전학되어, 1년간의 학교 생활 끝에 프로그래머 면허를 취득하는 것을 목표로 합니다.
-학교와 고시원을 오가는 하루를 반복하며 사람들을 만나고, 스탯을 키워 평가를 통과해야 합니다.
+고2 때 학교를 그만둔 천율은 삼촌이 하는 고시원 방 한 칸에 얹혀살며 검정고시를 준비합니다. 시험까지 남은 시간은 나흘.
+방값은 한 달 35만 원 선불이고, 지갑에는 만 이천 원이 있습니다. 하루에 한 번, **도서관에 갈지 알바를 갈지** 골라야 합니다.
 
 | 항목 | 내용 |
 |---|---|
 | 장르 | 비주얼 노벨 + 육성 |
 | 플랫폼 | PC (Windows) · 1인 |
-| 플레이 타임 | 60 ~ 90분 |
-| 구현 범위 | 1학기 진단평가까지 (프롤로그 한 달 분량) |
+| 플레이 타임 | 약 10분 |
+| 구현 범위 | 나흘 이야기 · 엔딩 3종 · 호감도 에필로그 2종 |
 
-- **스토리 파트** — 대화를 따라 이야기를 전개합니다. 선택지와 호감도에 따라 만나는 사람과 장면이 달라집니다.
-- **육성 파트** — 자유 시간에 활동과 알바 미니게임으로 스탯을 키워, 진단평가 같은 위기를 넘깁니다.
+- **스토리 파트** — 고시원 방 · 복도, 도서관, 시험장(학교 앞)을 오가며 대화가 진행됩니다. 선택지에 따라 대답과 호감도가 바뀝니다.
+- **선택 파트** — 2·3일차 아침마다 도서관(공부)과 알바(미니게임 3종) 중 하나를 고르고, 그 조합으로 시험 결과와 엔딩이 갈립니다.
+- **엔딩** — 공부 2번(A) · 알바 2번(B) · 반반(C). 서윤 · 도윤 호감도가 높으면 엔딩 뒤에 한 줄씩 에필로그가 붙고, 끝나면 타이틀로 돌아가 새 게임으로 초기화됩니다.
 
 ---
 
@@ -32,6 +33,7 @@
 | **메인 NPC** | 스케줄 배치 스포너, 순찰 · 안내 Behavior Tree |
 | **군중 시스템** | 수백 명의 행인 이동 · 회피 · LOD, MassEntity 도입, 측정 기반 최적화 (−73%, −46%) |
 | **알바 미니게임** | 햄버거집 · 꽃집 · 편의점 미니게임 3종과 공통 프레임워크 |
+| **본편 흐름** | 나흘 시나리오 · 엔딩 분기 데이터, 목표 표시(화살표 + 문구), 타이틀 복귀 · 새 게임 초기화 |
 
 ---
 
@@ -42,7 +44,7 @@
 `UDialogueSubsystem`(Tickable World Subsystem)이 게임의 모든 대사와 연출을 맡습니다. 화면에 대사를 띄우고 사운드와 연출을 실행합니다.
 
 - 이벤트 테이블(`FNpcEventRow`)에서 조건에 맞는 Row를 고르고, 그 Row가 가리키는 대화 노드(`FDialogueNodeRow`)를 실행
-- 노드는 Branch(자동 분기)와 Choice(선택지)를 갖고, 각각 조건(`FGameCondition`)과 결과(`FGameAction`, 41종)를 가짐
+- 노드는 Branch(자동 분기)와 Choice(선택지)를 갖고, 각각 조건(`FGameCondition`)과 결과(`FGameAction`, 45종)를 가짐
 - **이벤트 선택** — 조건 충족 + 최고 우선순위, 동점이면 테이블 순서
 - **여러 NPC 동시 등장** — 참가자 전원 순찰 중지 → 대화 후 한꺼번에 해제
 - **자리별 대화** — 같은 NPC라도 교실과 옥상에서 다른 대사
@@ -76,9 +78,20 @@ EnterTalkForParticipants(Participants, InInstigator);
 | `DT_MiniGameTestEvents` · `DT_MiniGameTestDialogue` | 테스트 맵 전용 대화 → 선택지 → AP 소모까지 한 번에 확인 |
 | 테스트 맵 AP 보충 | `L_MiniGameTest`에서는 시간대와 상관없이 AP 3으로 시작 (Shipping 제외) |
 
+**목표 표시** — 플레이 테스트에서 "어디로 가서 무엇과 상호작용해야 하는지 모르겠다"는 피드백이 나와 추가했습니다.
+- 대사 데이터의 `SetObjective` 액션 한 줄로 대상(NpcId 또는 액터 태그) 머리 위에 화살표를 띄우고, 화면 왼쪽 위에 목표 문구를 씀
+- 목표는 `UObjectiveSubsystem`(Tickable World Subsystem)이 들고 있어 레벨이 바뀌면 자연히 사라짐 → 지우는 걸 깜빡해 다음 장면에 화살표가 남는 일이 없음
+- 걸어가야 하는 장면은 기존 자동 진행(`WhenPlayerNearNpc`)과 묶어 "화살표를 따라가 다가가면 대화 시작"으로 만듦
+
+**대사 스크립트** — 대본은 텍스트(`Data/DT_StoryDialogue.txt`)로 쓰고, 파서가 대화 테이블 행으로 바꿉니다. 화자 · 선택지 · 분기 · 액션을 한 파일에서 읽을 수 있어 대본 수정이 에디터 작업 없이 끝납니다.
+
 **트러블슈팅 — 주말이 지나면 날짜가 초기화돼 이벤트가 어긋남**
 - 원인: 주 단위 상대 날짜로 주말을 판정했고, 초기화되지 않은 값이 남아 있었음
 - 해결: 절대 일차 기준으로 계산하고, 날짜 테스트 테이블로 검증
+
+**트러블슈팅 — 분기 조건이 하나도 맞지 않으면 그 뒤 대사가 통째로 사라짐**
+- 원인: 대사 스크립트는 `@branch` 뒤의 `@jump`를 "그 외의 경우"로 쓰는데, 런타임은 분기가 하나라도 있으면 다음 노드를 보지 않고 대화를 끝냄 (알바를 안 한 밤에 침대 목표가 안 뜸)
+- 해결: 맞는 분기가 없으면 `NextNodeId`로 넘어가도록 수정 → 스크립트와 런타임의 규칙을 하나로 맞춤
 
 ---
 
@@ -247,15 +260,18 @@ Mass 이동 병렬화(계산은 워커 스레드, 적용만 게임 스레드)는
 
 ### 공통 프레임워크
 
-튜토리얼 카드 → 연습 판 → 본 게임 → 결과 · 보상. 새 미니게임은 **위젯 1개 + 설정 한 줄 + 문 배치**로 추가합니다 (꽃집 · 편의점을 이 방법으로 추가).
+튜토리얼 카드 → 연습 판 → 본 게임 → 결과 · 보상. 새 미니게임은 **위젯 1개 + 설정 한 줄**로 추가합니다 (꽃집 · 편의점을 이 방법으로 추가).
 
 | 클래스 | 역할 |
 |---|---|
-| `UMiniGameSettings` | 레벨 이름 → 위젯 클래스 · 시작 위치 · 보상 (Project Settings에서 기획자가 수정) |
-| `UMiniGameSubsystem` | 띄우기, 입력 잠금, 보상 지급(중복 방지), 복귀 |
-| `UMiniGameTravelSubsystem` | 들어오기 전 레벨 기억 |
+| `UMiniGameSettings` | 키 → 위젯 클래스 · 보상 (Project Settings에서 기획자가 수정) |
+| `UMiniGameSubsystem` | 띄우기, 입력 잠금, 보상 지급(중복 방지), 끝난 뒤 본편으로 복귀 |
 | `UMiniGameWidget` | FinishGame / PreviewReward / ExitGame |
-| `AMiniGameDoor` | E키로 지정 레벨 이동 |
+| `AMiniGameDoor` · `UMiniGameTravelSubsystem` | 테스트 맵에서 E키로 미니게임 레벨에 들어가고 원래 레벨로 돌아옴 |
+
+**진입 방식 변경 — 가게 맵 대신 선택지에서 바로**
+- 처음에는 가게 맵으로 이동한 뒤 가게 안의 문과 상호작용해야 시작했는데, 가게를 채울 직원 · 손님 모델이 없어 빈 가게를 걸어 다니는 시간만 늘었음
+- 아침 선택지에서 가게를 고르면 `StartMiniGame` 액션이 **레벨 이동 없이 지금 레벨에서** 미니게임을 띄우도록 변경 → 가게 맵 2개와 손님 AI 코드를 걷어내고, 플레이 흐름도 짧아짐
 
 ### 화면을 그리는 방식 — 의사결정
 
@@ -301,7 +317,9 @@ AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까�
 | [`MainNpcSpawner.cpp`](Source/Febricula/Private/NPC/MainNpc/MainNpcSpawner.cpp) | 메인 NPC 스케줄 스포너 |
 | [`SubNpcDirectorSubsystem.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcDirectorSubsystem.cpp) | 군중 감독: 경로 이동, 회피, LOD |
 | [`SubNpcMassProcessors.cpp`](Source/Febricula/Private/NPC/SubNpc/SubNpcMassProcessors.cpp) | Mass 이동 병렬화 · 원경 표현 프로세서 |
-| [`MiniGameSubsystem.cpp`](Source/Febricula/Private/MiniGame/MiniGameSubsystem.cpp) | 미니게임 공통 프레임워크 |
+| [`MiniGameSubsystem.cpp`](Source/Febricula/Private/MiniGame/MiniGameSubsystem.cpp) | 미니게임 공통 프레임워크, 본편 흐름(알바 후 귀가 · 새 게임 초기화) |
+| [`ObjectiveSubsystem.cpp`](Source/Febricula/Private/Objective/ObjectiveSubsystem.cpp) | 목표 표시: 대상 찾기 · 화살표 · 화면 문구 |
+| [`DT_StoryDialogue.txt`](Data/DT_StoryDialogue.txt) | 본편 대본 (나흘 · 엔딩 3종) |
 
 ---
 
