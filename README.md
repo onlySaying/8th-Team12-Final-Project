@@ -146,7 +146,9 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ### 부딪힘 반응 — 속도 구간 × 좌우 방향
 
-![부딪힘 반응](Docs/images/crowd_bump_2026-10-17.png)
+[![부딪힘 반응](Docs/images/crowd_bump_2026-10-17.png)](https://www.youtube.com/watch?v=dlVwlgWQhII)
+
+[▶ 부딪힘 반응 영상 — 걷기 · 달리기 × 왼쪽 · 오른쪽](https://www.youtube.com/watch?v=dlVwlgWQhII)
 
 플레이어가 행인에게 부딪히면 **부딪힌 속도**로 반응을, **부딪힌 방향**으로 밀려나는 쪽을 정합니다.
 
