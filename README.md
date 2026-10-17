@@ -120,7 +120,9 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ## 🚶 군중 시스템 — 측정 기반 최적화
 
-![군중 시스템](Docs/images/crowd_overview_2026-10-17.jpg)
+[![군중 시스템](Docs/images/crowd_overview_2026-10-17.jpg)](https://www.youtube.com/watch?v=DIeaa7na75A)
+
+[▶ 군중 영상 — 그룹 이동 · 스팟 이벤트 · 줄서기 · 병목 통과](https://www.youtube.com/watch?v=DIeaa7na75A)
 
 수백 명의 행인을 싸게 돌리는 설계. `USubNpcDirectorSubsystem`이 행인 전원의 이동 · 회피 · LOD를 한 곳에서 처리하고(Active/Pooled 풀), `ASubNpcCharacter`는 상태만 보유합니다.
 
