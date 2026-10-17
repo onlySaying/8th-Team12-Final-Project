@@ -21,6 +21,9 @@
 #include "Progress/GameProgressSubsystem.h"
 #include "TimerManager.h"
 #include "Activity/ActivitySubsystem.h"
+#include "Activity/ActivitySetting.h"
+#include "GameMode/TimeSubsystem.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogMiniGame, Log, All);
 
@@ -29,6 +32,107 @@ namespace MiniGameStart
 	/** 폰을 기다리는 간격 · 최대 횟수 (0.1초 × 30 = 3초) */
 	constexpr float RetryInterval = 0.1f;
 	constexpr int32 MaxAttempts = 30;
+
+	// [skydodo] 2026-10-17 추가: 본편 대화(버스 정류장 → 편의점)로 들어오는 미니게임 전용 맵.
+	// 문 상호작용 없이 레벨 이동만으로 들어오므로 예약이 없어도 바로 시작한다.
+	static bool IsDedicatedLevel(FName LevelKey)
+	{
+		return LevelKey == TEXT("L_ConvenienceStore");
+	}
+}
+
+// [skydodo] 2026-10-17 추가: 시연 영상용 일주일 흐름.
+// 1~3일차는 저녁이 되면 다음 날로 넘기고, 4일차부터는 아침에 바로 버스 정류장(알바 선택지)으로 보낸다.
+// 알바를 하나 끝내면 다음 날 정류장으로, 6일차 알바까지 끝나면 게임을 끈다.
+namespace DemoFlow
+{
+	constexpr int32 LastStoryDay = 3;
+	constexpr int32 LastWorkDay = 6;
+	constexpr float CheckInterval = 0.5f;
+
+	static bool IsMainFlowLevel(FName LevelKey)
+	{
+		return LevelKey != TEXT("L_MiniGameTest") && LevelKey != TEXT("FreeLoad");
+	}
+
+	static UTimeSubsystem* GetTime(const UWorld* World)
+	{
+		UGameInstance* GI = World ? World->GetGameInstance() : nullptr;
+		return GI ? GI->GetSubsystem<UTimeSubsystem>() : nullptr;
+	}
+
+	static void OpenLevelByKey(UObject* WorldContext, FName Key)
+	{
+		if (const TSoftObjectPtr<UWorld>* Level = GetDefault<UActivitySetting>()->Levels.Find(Key))
+		{
+			UGameplayStatics::OpenLevelBySoftObjectPtr(WorldContext, *Level);
+		}
+	}
+
+	/** 다음 날 아침으로 넘기고, 이야기 기간이면 방 · 알바 기간이면 정류장에서 시작한다 */
+	static void GoNextDay(UWorld* World)
+	{
+		UTimeSubsystem* Time = GetTime(World);
+		if (!Time)
+		{
+			return;
+		}
+		Time->ResetSchedule();
+		UE_LOG(LogMiniGame, Log, TEXT("[시연] %d일차로 넘김"), Time->GetAbsoluteDay());
+		OpenLevelByKey(World, Time->GetAbsoluteDay() > LastStoryDay ? FName(TEXT("MiddleBus")) : FName(TEXT("Room")));
+	}
+
+	static void OnLevelStarted(UWorld& World, FName LevelKey)
+	{
+		UTimeSubsystem* Time = GetTime(&World);
+		if (!Time || !IsMainFlowLevel(LevelKey))
+		{
+			return;
+		}
+
+		// 알바 기간에 방에서 깨면 바로 정류장으로
+		if (Time->GetAbsoluteDay() > LastStoryDay && LevelKey == TEXT("Room"))
+		{
+			OpenLevelByKey(&World, TEXT("MiddleBus"));
+			return;
+		}
+
+		// 이야기 기간에는 저녁 시간대가 되면 다음 날로. 시간대 이동 액션이 저녁을 거쳐 지나가는 중일 수 있어
+		// 바로 넘기지 않고 다음 검사 때도 저녁이면 넘긴다.
+		if (Time->GetAbsoluteDay() <= LastStoryDay)
+		{
+			FTimerHandle Handle;
+			const TWeakObjectPtr<UWorld> WeakWorld(&World);
+			World.GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateWeakLambda(&World, [WeakWorld]()
+			{
+				UWorld* W = WeakWorld.Get();
+				UTimeSubsystem* T = GetTime(W);
+				if (T && T->GetAbsoluteDay() <= LastStoryDay && T->GetNowScheduleName() == TEXT("Schedule.Dinner"))
+				{
+					W->GetTimerManager().ClearAllTimersForObject(W);
+					GoNextDay(W);
+				}
+			}), CheckInterval, true, CheckInterval);
+		}
+	}
+
+	/** 알바를 끝냈을 때. 시연 흐름이 처리했으면 true (원래 복귀 처리를 건너뛴다) */
+	static bool OnMiniGameEnded(UWorld* World, FName LevelKey)
+	{
+		UTimeSubsystem* Time = GetTime(World);
+		if (!Time || !IsMainFlowLevel(LevelKey) || Time->GetAbsoluteDay() <= LastStoryDay)
+		{
+			return false;
+		}
+		if (Time->GetAbsoluteDay() >= LastWorkDay)
+		{
+			UE_LOG(LogMiniGame, Log, TEXT("[시연] 마지막 알바 완료 - 게임 종료"));
+			UKismetSystemLibrary::QuitGame(World, World->GetFirstPlayerController(), EQuitPreference::Quit, false);
+			return true;
+		}
+		GoNextDay(World);
+		return true;
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -117,6 +221,8 @@ void UMiniGameSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 	}
 
 	const FName LevelKey = GetLevelShortName(InWorld);
+	DemoFlow::OnLevelStarted(InWorld, LevelKey);
+
 	const FMiniGameLevelEntry* Entry = GetDefault<UMiniGameSettings>()->Levels.Find(LevelKey);
 	if (!Entry)
 	{
@@ -130,7 +236,7 @@ void UMiniGameSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 
 	if (UMiniGameTravelSubsystem* TravelSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UMiniGameTravelSubsystem>())
 	{
-		if (TravelSubsystem->GetMinigameBooking())
+		if (TravelSubsystem->GetMinigameBooking() || MiniGameStart::IsDedicatedLevel(LevelKey))
 		{
 			// BeginPlay 시점에 폰이 이미 있는 게 보통이지만, 게임모드에 따라 한 틱 늦게 생기기도 한다.
 			InWorld.GetTimerManager().SetTimer(StartTimer, this, &UMiniGameSubsystem::TryStart, MiniGameStart::RetryInterval, true, 0.f);
@@ -411,6 +517,11 @@ void UMiniGameSubsystem::EndMiniGame()
 		PC->SetShowMouseCursor(false);
 		PC->ResetIgnoreMoveInput();
 		PC->ResetIgnoreLookInput();
+	}
+
+	if (World && DemoFlow::OnMiniGameEnded(World, ActiveLevelKey))
+	{
+		return;
 	}
 
 	UGameInstance* GI = World ? World->GetGameInstance() : nullptr;
