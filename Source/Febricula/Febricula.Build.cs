@@ -23,9 +23,7 @@ public class Febricula : ModuleRules
 			"SlateCore",
 			"DeveloperSettings",
 			"GameplayTags", "CinematicCamera",
-			// BurgerHouse — 손님이 앉을 자리로 순간이동할 때 내비메시에 투영한다
-			// (ACustomerCharacter::TeleportToPoint). 안 하면 벽 안에서 시작해
-			// 이후 MoveTo 가 전부 실패한다.
+			// 메인 NPC 순찰·안내 이동
 			"NavigationSystem",
 			// [skydodo] 2026-10-07 추가: 행인 Mass / AnimToTexture 모듈
 			// 행인 이동 계산을 Mass 프로세서에서 병렬로 돌린다 (SubNpcMassProcessors).
@@ -48,10 +46,7 @@ public class Febricula : ModuleRules
 		}
 
 		PublicIncludePaths.AddRange(new string[] {
-			"Febricula",
-			// [skydodo] 2026-09-10 추가: BurgerHouse include 경로
-			// BurgerHouse — 손님 NPC 루프 (Import/BURGERHOUSE.md)
-			"Febricula/BurgerHouse"
+			"Febricula"
 		});
 
 	}

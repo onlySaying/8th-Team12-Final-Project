@@ -61,20 +61,6 @@ AFebriculaCharacter::AFebriculaCharacter()
 	// instead of recompiling to adjust them
 	WalkSpeed = 500.f;
 	SprintSpeed = 1000.f;
-
-	// 버거집은 좁은 실내라 뛰어다닐 곳이 아니다. 손님·기물 사이를 1000 으로
-	// 지나가면 부딪히기만 한다.
-	//
-	// ⚠ 여기가 **기본값**이라 어떤 플레이어 폰을 쓰든 따라온다. 블루프린트에서
-	//   지우거나 더 넣을 수 있다 (`SprintBlockedLevels` 주석).
-	SprintBlockedLevels.Add(TEXT("L_BurgerHouse"));
-
-	// 같은 이유로 걷기도 느리게. 손님(`BP_Customer`)도 같은 350 이라 플레이어가
-	// 손님을 추월하거나 뒤에 끼이지 않는다.
-	//
-	// ⚠ `WalkSpeed` 자체를 350 으로 내리면 **모든 레벨이 느려진다.** 그래서
-	//   레벨별 맵으로 둔다.
-	LevelWalkSpeedOverrides.Add(TEXT("L_BurgerHouse"), 350.f);
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -235,7 +221,7 @@ bool AFebriculaCharacter::IsSprintAllowed() const
 		return true;
 	}
 
-	// ⚠ `GetWorld()->GetMapName()` 을 그냥 쓰면 PIE 에서 `UEDPIE_0_L_BurgerHouse`
+	// ⚠ `GetWorld()->GetMapName()` 을 그냥 쓰면 PIE 에서 `UEDPIE_0_Room`
 	//    가 나와 **에디터에서만 비교가 실패한다.** 패키지 빌드에서는 맞고 PIE 에서만
 	//    틀리는, 가장 늦게 발견되는 종류의 버그다. 이 함수가 접두사를 떼 준다.
 	const FString Current = UGameplayStatics::GetCurrentLevelName(this, /*bRemovePrefixString=*/true);

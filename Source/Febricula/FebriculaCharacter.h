@@ -57,9 +57,9 @@ protected:
 	 *
 	 *	⚠ 이름은 `UGameplayStatics::GetCurrentLevelName(..., true)` 와 비교한다 —
 	 *	  PIE 접두사(`UEDPIE_0_`)는 그 함수가 떼어 준다. 경로가 아니라 **이름만**
-	 *	  넣을 것 (`L_BurgerHouse`, `/Game/BurgerHouse/Maps/L_BurgerHouse` 아님).
+	 *	  넣을 것 (`Room`, `/Game/Levels/Room` 아님).
 	 *
-	 *	⚠⚠ **퍼시스턴트 레벨 이름**이다. BurgerHouse 를 다른 맵의 서브레벨로
+	 *	⚠⚠ **퍼시스턴트 레벨 이름**이다. 그 레벨을 다른 맵의 서브레벨로
 	 *	  스트리밍해 넣으면 이름이 안 맞아 스프린트가 **다시 풀린다.** 그때는
 	 *	  퍼시스턴트 쪽 이름을 넣거나 판정을 바꿔야 한다.
 	 */
