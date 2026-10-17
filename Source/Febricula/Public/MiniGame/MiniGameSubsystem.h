@@ -79,6 +79,9 @@ public:
 	//~ End UWorldSubsystem
 
 	bool IsMiniGameActive() const { return ActiveWidget != nullptr; }
+
+	/** MiniGame Setting의 EntryKey 항목을 레벨 이동 없이 지금 레벨에서 띄운다 (본편 대화의 StartMiniGame 액션) */
+	bool StartHere(FName EntryKey);
 	
 	void TryStart();
 
@@ -108,7 +111,7 @@ private:
 
 	static FName GetLevelShortName(const UWorld& World);
 
-	/** 플레이 횟수를 쌓는 GameProgressSubsystem 카운터 이름. 예: MiniGame.L_BurgerHouse.Played */
+	/** 플레이 횟수를 쌓는 GameProgressSubsystem 카운터 이름. 예: MiniGame.Burger.Played */
 	FName GetPlayCounterId() const;
 
 	FMiniGameLevelEntry ActiveEntry;

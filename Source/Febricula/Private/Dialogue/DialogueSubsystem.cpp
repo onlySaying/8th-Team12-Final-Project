@@ -33,6 +33,8 @@
 #include "NPC/MainNpc/NpcAffinitySubsystem.h"
 #include "WorldPartition/HLOD/HLODActor.h"
 #include "Dialogue/DialogueLogSubsystem.h"
+#include "Objective/ObjectiveSubsystem.h"
+#include "MiniGame/MiniGameSubsystem.h"
 
 TStatId UDialogueSubsystem::GetStatId() const
 {
@@ -836,9 +838,8 @@ void UDialogueSubsystem::ResolveNodeExit()
 			}
 		}
 
-		// 어느 갈래도 통과 못하면 대화를 끝낸다 (데이터에 else 갈래를 넣어두는 걸 권장)
-		FinishDialogue();
-		return;
+		// [skydodo] 2026-10-18 수정: 어느 갈래도 통과 못하면 NextNodeId로 간다 (대사 스크립트의 @branch 뒤 @jump가 else).
+		// 예전엔 바로 대화를 끝내서, else로 쓴 @jump 쪽 대사가 통째로 건너뛰어졌다.
 	}
 
 	// 3) 단순 다음 노드
@@ -1379,7 +1380,9 @@ void UDialogueSubsystem::ExecuteAction(const FGameAction& Action)
 				// 	break;
 				// }
 				
-				ABaseNpcCharacter* Character = GetWorld()->SpawnActorDeferred<ABaseNpcCharacter>(SpawnClass, SpawnTransform);
+				// [skydodo] 2026-10-18 수정: 스폰 지점이 책상·의자에 조금만 겹쳐도 스폰이 거부돼 장면이 NPC 없이 멈췄다
+				ABaseNpcCharacter* Character = GetWorld()->SpawnActorDeferred<ABaseNpcCharacter>(SpawnClass, SpawnTransform,
+					nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 				if (Character)
 				{
 					Character->SetNpcId(Action.Key);
@@ -1539,6 +1542,28 @@ void UDialogueSubsystem::ExecuteAction(const FGameAction& Action)
 				break;
 			}
 			ActivitySubsystem->ActivityFinished(Action.Key, Action.Value);
+		}
+		break;
+
+	case EGameActionType::SetObjective:
+		if (UObjectiveSubsystem* Objective = GetWorld()->GetSubsystem<UObjectiveSubsystem>())
+		{
+			const FString Text = Action.Key2.IsNone() ? FString() : Action.Key2.ToString().Replace(TEXT("_"), TEXT(" "));
+			Objective->SetObjective(Action.Key, FText::FromString(Text));
+		}
+		break;
+
+	case EGameActionType::ClearObjective:
+		if (UObjectiveSubsystem* Objective = GetWorld()->GetSubsystem<UObjectiveSubsystem>())
+		{
+			Objective->ClearObjective();
+		}
+		break;
+
+	case EGameActionType::StartMiniGame:
+		if (UMiniGameSubsystem* MiniGame = GetWorld()->GetSubsystem<UMiniGameSubsystem>())
+		{
+			MiniGame->StartHere(Action.Key);
 		}
 		break;
 		

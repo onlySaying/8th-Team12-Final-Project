@@ -1,0 +1,479 @@
+// 「미열」 본편 - 검정고시 나흘
+// 이벤트 행(DT_MainStroyEvent)이 아래 @label 중 하나를 RootNodeId로 가리킨다.
+// 카운터 Study = 도서관에 간 날 수, 태그 Today.Work = 오늘 알바를 했다 (밤에 지운다)
+
+@cast 천율 = "강천율" PC_GangChunyul
+@cast 서윤 = "한서윤" NPC_Suyun
+@cast 도윤 = "김도윤" NPC_Doyun
+@cast 삼촌 = "삼촌" NPC_Uncle
+
+// ===========================================================================
+// 1일차
+// ===========================================================================
+
+@label D1_Room
+@FadeIn 1
+고시원 3층 7호실. 창문 없는 방이 한 달에 삼십오만 원.
+검정고시까지 나흘.
+@PlaySE First bell
+삼촌: 천율아. 살아 있냐.
+천율: 네.
+삼촌: 도서관 아홉 시에 연다. 늦으면 자리 없다.
+천율: 지금 나가요.
+@FadeOut Black 10
+@TimeSetSchedule Schedule.AfterSchool
+@wait 1
+@hide
+@label D1_Room_w1
+@ChangeLevel Library
+@wait 0.1
+@hide
+@end
+
+@label D1_Library
+@SpawnActor NPC_Suyun Story_LibSuyun
+@FadeIn 1
+@SetObjective NPC_Suyun 빈자리_찾기
+평일 오전의 열람실. 빈자리가 거의 없다.
+@wait_near 200 NPC_Suyun
+@hide
+@label D1_Library_w1
+@ClearObjective
+@NpcFacePlayer NPC_Suyun
+서윤: 거기 내 자리인데요.
+@menu
+- 옮길게요. -> D1_Lib_Move
+- 이름 써 있어요? -> D1_Lib_Name
+
+@label D1_Lib_Move
+@AddAffinity NPC_Suyun 5
+서윤: 됐어요. 오늘은 앉아요. 조용히만.
+@jump D1_Lib_Sit
+
+@label D1_Lib_Name
+서윤: …아뇨. 일 년째 앉아서요.
+서윤: 됐어요, 앉아요. 조용히만.
+@jump D1_Lib_Sit
+
+@label D1_Lib_Sit
+@FadeOut Black 10
+@wait 1.2
+@hide
+@label D1_Library_w2
+@FadeIn 1
+오후 네 시.
+서윤: 그거 틀렸어요.
+천율: 네?
+서윤: 수학 7번. 부호.
+서윤: 검정고시죠? 그 유형은 매번 나와요.
+천율: …감사합니다.
+서윤: 근데 검정고시 보는데 교복은 왜 입어요?
+@menu
+- 옷이 이거밖에 없어서요. -> D1_Lib_Clothes
+- 그쪽은 왜 입었는데요. -> D1_Lib_Back
+
+@label D1_Lib_Clothes
+@AddAffinity NPC_Suyun 5
+서윤: …….
+@jump D1_Lib_End
+
+@label D1_Lib_Back
+서윤: 학교 끝나고 바로 와서요.
+서윤: …질문에 질문으로 답하네.
+@jump D1_Lib_End
+
+@label D1_Lib_End
+@AddStat Int 2
+@FadeOut Black 10
+@TimeSetSchedule Schedule.Night
+@wait 1
+@hide
+@label D1_Library_w3
+@ChangeLevel HallWay
+@wait 0.1
+@hide
+@end
+
+@label D1_Hallway
+@SpawnActor NPC_Doyun Story_HallDoyun
+@FadeIn 1
+@SetObjective NPC_Doyun 복도의_사람
+밤 열 시. 3층 복도.
+@wait_near 200 NPC_Doyun
+@hide
+@label D1_Hallway_w1
+@ClearObjective
+@NpcFacePlayer NPC_Doyun
+도윤: 7호실? 새로 왔어요?
+천율: 네.
+도윤: 8호실이에요. 벽 얇으니까 통화는 밖에서 해요.
+도윤: 뭐 준비해요?
+천율: 검정고시요.
+도윤: 아. 난 학교 끝나면 알바. 매일.
+도윤: 돈 필요하면 말해요. 햄버거집, 꽃집, 편의점. 다 사람 구해요.
+@menu
+- 필요해요. -> D1_Hall_Need
+- 괜찮아요. -> D1_Hall_Fine
+
+@label D1_Hall_Need
+@AddAffinity NPC_Doyun 20
+도윤: 솔직해서 좋네. 내일 사장님들한테 말해 둘게요.
+@jump D1_Hall_Uncle
+
+@label D1_Hall_Fine
+도윤: 그래요? 방값 선불인데.
+@jump D1_Hall_Uncle
+
+@label D1_Hall_Uncle
+관리실 창문 너머로 삼촌 목소리가 들렸다.
+삼촌: 도서관은.
+천율: 자리 있었어요.
+삼촌: 다행이네.
+천율: 삼촌, 방값은…
+삼촌: 그 얘기 또 하면 쫓아낸다.
+천율: 그럼 쫓겨나야겠네요.
+삼촌: …밥이나 먹어. 냉장고에 반찬 있다.
+복도 게시판. 「월 35만 원 · 선불」.
+지갑에는 만 이천 원.
+@FadeOut Black 10
+@wait 1
+@hide
+@label D1_Hallway_w2
+@ChangeLevel Room
+@wait 0.1
+@hide
+@end
+
+// ===========================================================================
+// 밤 - 방으로 돌아오면 침대를 가리킨다 (1~3일차 공통)
+// ===========================================================================
+
+@label Night_Room
+@FadeIn 1
+@if HasTag Today.Work
+@branch Night_Work
+@jump Night_Bed
+
+@label Night_Work
+@RemoveTag Today.Work
+일당은 봉투에 들어 있었다. 생각보다 얇았다.
+@jump Night_Bed
+
+@label Night_Bed
+@SetObjective Obj_Bed 침대에서_하루_마치기
+@wait 0.1
+@hide
+@end
+
+// ===========================================================================
+// 2·3일차 아침 - 도서관이냐 알바냐
+// ===========================================================================
+
+@label Morning
+@FadeIn 1
+@if DayEquals 3
+@branch Morning_D3
+@jump Morning_D2
+
+@label Morning_D2
+시험까지 사흘.
+@jump Morning_Choice
+
+@label Morning_D3
+시험까지 이틀.
+@jump Morning_Choice
+
+@label Morning_Choice
+지갑에 든 돈으로는 이번 달 방값의 절반도 안 된다.
+@menu
+- 도서관에 간다 -> GoLibrary
+@AddCounter Study 1
+- 알바하러 간다 -> WorkMenu
+
+@label WorkMenu
+어디로 갈까.
+@menu
+- 햄버거집 -> GoBurger
+- 꽃집 -> GoFlower
+- 편의점 -> GoStore
+- 그만둔다 -> Morning_Choice
+
+@label GoLibrary
+@FadeOut Black 10
+@TimeSetSchedule Schedule.AfterSchool
+@wait 1
+@hide
+@label GoLibrary_w1
+@ChangeLevel Library
+@wait 0.1
+@hide
+@end
+
+@label GoBurger
+@GrantTag Today.Work
+@FadeOut Black 10
+@TimeSetSchedule Schedule.AfterSchool
+@wait 1
+@hide
+@label GoBurger_w1
+@StartMiniGame Burger
+@wait 0.1
+@hide
+@end
+
+@label GoFlower
+@GrantTag Today.Work
+@FadeOut Black 10
+@TimeSetSchedule Schedule.AfterSchool
+@wait 1
+@hide
+@label GoFlower_w1
+@StartMiniGame Flower
+@wait 0.1
+@hide
+@end
+
+@label GoStore
+@GrantTag Today.Work
+@FadeOut Black 10
+@TimeSetSchedule Schedule.AfterSchool
+@wait 1
+@hide
+@label GoStore_w1
+@StartMiniGame L_ConvenienceStore
+@wait 0.1
+@hide
+@end
+
+// ===========================================================================
+// 도서관 (2·3일차)
+// ===========================================================================
+
+@label Lib_First
+@SpawnActor NPC_Suyun Story_LibSuyun
+@FadeIn 1
+@SetObjective NPC_Suyun 어제_그_자리
+@wait_near 200 NPC_Suyun
+@hide
+@label Lib_First_w1
+@ClearObjective
+@NpcFacePlayer NPC_Suyun
+서윤: 또 왔네요.
+천율: 오늘도 앉아도 돼요?
+서윤: 일찍 오면요.
+@FadeOut Black 10
+@wait 1.2
+@hide
+@label Lib_First_w2
+@FadeIn 1
+서윤: 몇 과목이에요?
+천율: 여섯이요.
+서윤: 사흘에 여섯 과목이면 하루에 두 개네요.
+천율: 계산 빠르시네요.
+서윤: 이과라서요.
+@AddAffinity NPC_Suyun 10
+@AddStat Int 3
+도서관 문을 닫을 때까지 있었다.
+@jump Lib_Leave
+
+@label Lib_Second
+@SpawnActor NPC_Suyun Story_LibSuyun
+@FadeIn 1
+@SetObjective NPC_Suyun 늘_앉던_자리
+@wait_near 200 NPC_Suyun
+@hide
+@label Lib_Second_w1
+@ClearObjective
+@NpcFacePlayer NPC_Suyun
+서윤: 내일이죠.
+천율: 네.
+서윤: 수학은 앞에서부터 풀지 마요. 아는 것부터.
+@menu
+- 감사합니다. -> Lib_Second_Thanks
+- 언제 보세요, 시험? -> Lib_Second_Ask
+
+@label Lib_Second_Thanks
+@AddAffinity NPC_Suyun 10
+서윤: 붙으면 커피 사요.
+@jump Lib_Second_End
+
+@label Lib_Second_Ask
+서윤: 수능이요. 일곱 달 남았어요.
+서윤: 나도 남 걱정할 때가 아닌데.
+@jump Lib_Second_End
+
+@label Lib_Second_End
+@AddStat Int 3
+도서관 문을 닫을 때까지 있었다.
+@jump Lib_Leave
+
+@label Lib_Leave
+@FadeOut Black 10
+@TimeSetSchedule Schedule.Night
+@wait 1
+@hide
+@label Lib_Leave_w1
+@ChangeLevel Room
+@wait 0.1
+@hide
+@end
+
+// ===========================================================================
+// 4일차 - 시험
+// ===========================================================================
+
+@label D4_Room
+@FadeIn 1
+삼촌: 수험표.
+천율: 챙겼어요.
+삼촌: 신분증.
+천율: 챙겼어요.
+삼촌: …밥은.
+천율: 다녀와서요.
+@FadeOut Black 10
+@TimeSetSchedule Schedule.MorningActivity
+@wait 1.2
+@hide
+@label D4_Room_w1
+@ChangeLevel SchoolOutside
+@wait 0.1
+@hide
+@end
+
+// 시험장 앞 - 군중 사이를 걸어 교문(Obj_ExamDoor)까지 간다
+@label D4_Outside
+@Teleport Player Story_ExamStart
+@FadeIn 1
+검정고시 시험장은 근처 고등학교였다.
+@SetObjective Obj_ExamDoor 시험장으로
+교문 앞이 수험생들로 붐볐다. 교복 입은 사람이 나 말고도 꽤 있었다.
+@end
+
+// 교문 상호작용(D4_ExamDoor 이벤트)으로 시작한다
+@label D4_Exam
+@ClearObjective
+@FadeOut Black 10
+@wait 1.2
+@hide
+@label D4_Exam_w1
+@if CounterAtLeast Study 1
+@branch D4_Exam_Studied
+@jump D4_Exam_NotStudied
+
+@label D4_Exam_Studied
+수학 7번은 부호 문제였다. 이번엔 틀리지 않았다.
+@jump D4_Result
+
+@label D4_Exam_NotStudied
+수학 7번에서 한참 멈췄다.
+@jump D4_Result
+
+@label D4_Result
+저녁 여섯 시. 가답안이 올라왔다.
+@if CounterAtLeast Study 2
+@branch D4_Result_High
+@if CounterAtLeast Study 1
+@branch D4_Result_Mid
+@jump D4_Result_Low
+
+@label D4_Result_High
+가채점 평균 82.
+@jump D4_Leave
+
+@label D4_Result_Mid
+가채점 평균 67. 붙긴 붙는다.
+@jump D4_Leave
+
+@label D4_Result_Low
+가채점 평균 58. 2점이 모자랐다.
+@jump D4_Leave
+
+@label D4_Leave
+@TimeSetSchedule Schedule.Night
+@wait 0.5
+@hide
+@label D4_Leave_w1
+@ChangeLevel HallWay
+@wait 0.1
+@hide
+@end
+
+// ===========================================================================
+// 엔딩 - 고시원 복도, 관리실 창문 앞
+// ===========================================================================
+
+@label Ending
+@FadeIn 1
+관리실 창문 너머로 텔레비전 소리가 났다.
+@if CounterAtLeast Study 2
+@branch Ending_A
+@if CounterAtMost Study 0
+@branch Ending_B
+@jump Ending_C
+
+@label Ending_A
+천율: 가채점 해 봤어요. 붙었어요.
+삼촌: 몇 점.
+천율: 평균 82요.
+삼촌은 채점표를 한참 들여다봤다. 그리고 냉장고에 붙였다.
+천율: 그걸 왜 붙여요.
+삼촌: 내 냉장고다.
+@jump Ending_Epilogue
+
+@label Ending_B
+천율: 방값이요.
+삼촌: 쫓아낸다고 했지.
+천율: 그럼 짐 쌀게요.
+삼촌: 시험은.
+천율: 2점 모자랐어요.
+삼촌은 봉투를 받아 서랍에 넣었다.
+서랍 안에 통장이 하나 있었다. 겉에 내 이름이 적혀 있었다.
+삼촌: 8월에 또 있지?
+천율: …네.
+삼촌: 자라.
+@jump Ending_Epilogue
+
+@label Ending_C
+삼촌: 시험은.
+천율: 붙긴 붙어요. 67이요.
+삼촌: 돈은.
+천율: 반쯤이요.
+삼촌: 둘 다 반이네.
+천율: …죄송해요.
+삼촌: 뭐가. 나흘 만에 그만하면 많이 한 거지.
+삼촌: 밥 먹자.
+@jump Ending_Epilogue
+
+@label Ending_Epilogue
+@if RelationshipAtLeast NPC_Suyun 2
+@branch Ending_Coffee
+@jump Ending_DoyunCheck
+
+@label Ending_Coffee
+다음 날, 도서관 그 자리 맞은편에 커피를 하나 놓고 왔다.
+@jump Ending_DoyunCheck
+
+@label Ending_DoyunCheck
+@if RelationshipAtLeast NPC_Doyun 2
+@branch Ending_Lunchbox
+@jump Ending_Title
+
+@label Ending_Lunchbox
+다음 날 아침, 방문 앞에 편의점 도시락이 하나 놓여 있었다.
+@jump Ending_Title
+
+@label Ending_Title
+@FadeOut Black 20
+@wait 2.5
+@hide
+@label Ending_Title_w1
+@FadeIn 1
+「미열」 — 끝
+@FadeOut Black 10
+@wait 1.2
+@hide
+@label Ending_Title_w2
+@ChangeLevel Title
+@wait 0.1
+@hide
+@end

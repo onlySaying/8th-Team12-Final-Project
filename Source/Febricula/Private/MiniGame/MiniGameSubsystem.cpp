@@ -23,7 +23,10 @@
 #include "Activity/ActivitySubsystem.h"
 #include "Activity/ActivitySetting.h"
 #include "GameMode/TimeSubsystem.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "GameMode/TimeSettings.h"
+#include "GameMode/DayScheduleAsset.h"
+#include "Dialogue/DialogueLogSubsystem.h"
+#include "NPC/MainNpc/NpcAffinitySubsystem.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogMiniGame, Log, All);
 
@@ -39,23 +42,18 @@ namespace MiniGameStart
 	{
 		return LevelKey == TEXT("L_ConvenienceStore");
 	}
+
+	/** 대화가 끝나고 입력이 풀린 다음 위젯이 입력을 가져가도록 조금 늦게 시작한다 */
+	constexpr float StartHereDelay = 0.5f;
 }
 
-// [skydodo] 2026-10-17 추가: 시연 영상용 일주일 흐름.
-// 1일차는 이야기대로 진행하고(저녁이 되면 다음 날로), 2일차부터는 방에서 깨면
-// DT_MainStroyEvent의 DemoWorkDay 대화가 방과후 시간대(행동력)로 맞추고 버스 정류장(알바 선택지)으로 보낸다.
-// 알바를 하나 끝내면 다음 날 방으로, 4일차 알바까지(알바 3개) 끝나면 게임을 끈다.
+// [skydodo] 2026-10-18 변경: 나흘짜리 본편 흐름 (검정고시 시나리오).
+// 이야기 진행은 DT_MainStroyEvent 데이터가 맡고, 여기서는 데이터로 표현하기 어려운 두 가지만 한다.
+// - 알바를 끝내면 그날 밤 방으로 돌려보낸다 (다음 날은 침대의 "다음날로"로 넘긴다)
+// - 타이틀(FreeLoad)에 들어오면 진행 상태를 지워 새 게임으로 만든다 (엔딩 후 다시 시작할 때)
 namespace DemoFlow
 {
-	constexpr int32 LastStoryDay = 1;
-	constexpr int32 LastWorkDay = 4;
-	constexpr float CheckInterval = 0.5f;
-
-	/** 알바 기간에 끼어들면 안 되는 2일차 이후 메인 스토리 (DT_MainStroyEvent) */
-	static const TCHAR* const SkippedStoryEvents[] = {
-		TEXT("MainStory7"), TEXT("MainStory8"), TEXT("MainStory9"), TEXT("MainStory11"), TEXT("MainStory14"),
-		TEXT("MainStory15"), TEXT("MainStory16"), TEXT("MainStory17"),
-	};
+	static const FName NightSchedule(TEXT("Schedule.Night"));
 
 	static bool IsMainFlowLevel(FName LevelKey)
 	{
@@ -76,70 +74,78 @@ namespace DemoFlow
 		}
 	}
 
-	/** 다음 날 아침으로 넘기고 방에서 시작한다 */
-	static void GoNextDay(UWorld* World)
+	/** 알바를 마친 그날 밤으로 맞추고 방에서 시작한다 */
+	static void GoHomeTonight(UWorld* World)
 	{
 		UTimeSubsystem* Time = GetTime(World);
 		if (!Time)
 		{
 			return;
 		}
-		Time->ResetSchedule();
-		UE_LOG(LogMiniGame, Log, TEXT("[시연] %d일차로 넘김"), Time->GetAbsoluteDay());
+		// TimeSetSchedule 액션과 같은 방식. 시간표 두 바퀴 안에 못 만나면 멈춘다
+		const int32 MaxSteps = FMath::Max(Time->GetScheduleDefs().Num(), 1) * 2;
+		for (int32 Step = 0; Time->GetNowScheduleName() != NightSchedule && Step < MaxSteps; ++Step)
+		{
+			Time->SpendSchedule();
+		}
+		UE_LOG(LogMiniGame, Log, TEXT("[본편] %d일차 밤, 방으로"), Time->GetAbsoluteDay());
 		OpenLevelByKey(World, TEXT("Room"));
 	}
 
-	static void OnLevelStarted(UWorld& World, FName LevelKey)
+	/** 시간·진행·호감도·대화 기록을 게임을 처음 켰을 때로 되돌린다 */
+	static void ResetForNewGame(UWorld& World)
 	{
-		UTimeSubsystem* Time = GetTime(&World);
-		if (!Time || !IsMainFlowLevel(LevelKey))
+		UGameInstance* GI = World.GetGameInstance();
+		if (!GI)
 		{
 			return;
 		}
 
-		// 1일차가 끝나는 순간 2일차 이야기가 먼저 걸리지 않도록 처음부터 완료 처리해 둔다
-		if (UGameProgressSubsystem* Progress = World.GetGameInstance()->GetSubsystem<UGameProgressSubsystem>())
+		if (UTimeSubsystem* Time = GI->GetSubsystem<UTimeSubsystem>())
 		{
-			for (const TCHAR* EventId : SkippedStoryEvents)
+			const UTimeSettings* Settings = GetDefault<UTimeSettings>();
+			FTimeSaveData Fresh;
+			Fresh.NowMonth = Settings->StartMonth;
+			if (const UDayScheduleAsset* WeekDay = Settings->WeekDaySchedule.LoadSynchronous())
 			{
-				Progress->MarkEventCompleted(EventId);
-			}
-		}
-
-		// 이야기 기간에는 저녁 시간대가 되면 다음 날로. 시간대 이동 액션이 저녁을 거쳐 지나가는 중일 수 있어
-		// 바로 넘기지 않고 다음 검사 때도 저녁이면 넘긴다.
-		if (Time->GetAbsoluteDay() <= LastStoryDay)
-		{
-			FTimerHandle Handle;
-			const TWeakObjectPtr<UWorld> WeakWorld(&World);
-			World.GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateWeakLambda(&World, [WeakWorld]()
-			{
-				UWorld* W = WeakWorld.Get();
-				UTimeSubsystem* T = GetTime(W);
-				if (T && T->GetAbsoluteDay() <= LastStoryDay && T->GetNowScheduleName() == TEXT("Schedule.Dinner"))
+				if (WeekDay->ScheduleDefs.Num() > 0)
 				{
-					W->GetTimerManager().ClearAllTimersForObject(W);
-					GoNextDay(W);
+					Fresh.NowSchedule = WeekDay->ScheduleDefs[0];
 				}
-			}), CheckInterval, true, CheckInterval);
+			}
+			Time->LoadSaveData(Fresh);
+		}
+		if (UGameProgressSubsystem* Progress = GI->GetSubsystem<UGameProgressSubsystem>())
+		{
+			Progress->LoadSaveData(FGameProgressSaveData());
+		}
+		if (UNpcAffinitySubsystem* Affinity = GI->GetSubsystem<UNpcAffinitySubsystem>())
+		{
+			Affinity->LoadSaveData(FNpcRelationshipSaveData());
+		}
+		if (UDialogueLogSubsystem* Log = GI->GetSubsystem<UDialogueLogSubsystem>())
+		{
+			Log->ClearDialogueLog();
+		}
+		UE_LOG(LogMiniGame, Log, TEXT("[본편] 타이틀 - 새 게임 상태로 초기화"));
+	}
+
+	static void OnLevelStarted(UWorld& World, FName LevelKey)
+	{
+		if (LevelKey == TEXT("FreeLoad"))
+		{
+			ResetForNewGame(World);
 		}
 	}
 
-	/** 알바를 끝냈을 때. 시연 흐름이 처리했으면 true (원래 복귀 처리를 건너뛴다) */
+	/** 알바를 끝냈을 때. 본편 흐름이 처리했으면 true (원래 복귀 처리를 건너뛴다) */
 	static bool OnMiniGameEnded(UWorld* World, FName LevelKey)
 	{
-		UTimeSubsystem* Time = GetTime(World);
-		if (!Time || !IsMainFlowLevel(LevelKey) || Time->GetAbsoluteDay() <= LastStoryDay)
+		if (!World || !GetTime(World) || !IsMainFlowLevel(LevelKey))
 		{
 			return false;
 		}
-		if (Time->GetAbsoluteDay() >= LastWorkDay)
-		{
-			UE_LOG(LogMiniGame, Log, TEXT("[시연] 마지막 알바 완료 - 게임 종료"));
-			UKismetSystemLibrary::QuitGame(World, World->GetFirstPlayerController(), EQuitPreference::Quit, false);
-			return true;
-		}
-		GoNextDay(World);
+		GoHomeTonight(World);
 		return true;
 	}
 }
@@ -273,6 +279,24 @@ void UMiniGameSubsystem::Deinitialize()
 	FixedCamera = nullptr;
 	BGMComponent = nullptr;
 	Super::Deinitialize();
+}
+
+bool UMiniGameSubsystem::StartHere(FName EntryKey)
+{
+	UWorld* World = GetWorld();
+	const FMiniGameLevelEntry* Entry = GetDefault<UMiniGameSettings>()->Levels.Find(EntryKey);
+	if (!World || !Entry || IsMiniGameActive())
+	{
+		UE_LOG(LogMiniGame, Warning, TEXT("미니게임 '%s'를 시작하지 못했다 (설정에 없거나 이미 진행 중)."), *EntryKey.ToString());
+		return false;
+	}
+
+	ActiveEntry = *Entry;
+	ActiveLevelKey = EntryKey;
+	bHasEntry = true;
+	StartAttempts = 0;
+	World->GetTimerManager().SetTimer(StartTimer, this, &UMiniGameSubsystem::TryStart, MiniGameStart::RetryInterval, true, MiniGameStart::StartHereDelay);
+	return true;
 }
 
 void UMiniGameSubsystem::TryStart()

@@ -273,7 +273,18 @@ enum class EGameActionType : uint8
 	
 	SetSEVolume				UMETA(DisplayName = "SE 볼륨"),
 	
-	FinishActivity			UMETA(DisplayName = "액티비티 종료")
+	FinishActivity			UMETA(DisplayName = "액티비티 종료"),
+
+	/**
+	 * Key(NpcId 또는 액터 태그) 위에 목표 화살표를 띄우고 Key2를 화면 왼쪽 위에 쓴다.
+	 * Key2는 FName이라 띄어쓰기 대신 '_'로 쓰면 공백으로 바꿔 보여 준다 (도윤에게_말_걸기)
+	 */
+	SetObjective			UMETA(DisplayName = "목표 표시"),
+
+	ClearObjective			UMETA(DisplayName = "목표 지우기"),
+
+	/** Key(MiniGame Setting의 키, 예: Burger) 미니게임을 레벨 이동 없이 지금 레벨에서 띄운다 */
+	StartMiniGame			UMETA(DisplayName = "미니게임 시작")
 };
 
 /**
@@ -389,7 +400,7 @@ struct FSoundLocation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	FName Target;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	float Blend;
+	float Blend = 0.f;
 	
 };
 
@@ -496,7 +507,7 @@ struct FDialogueNodeRow : public FTableRowBase
 	TArray<FGameAction> OnEnterActions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	bool bYesNo;
+	bool bYesNo = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 	TArray<FDialogueChoice> Choices;

@@ -3,7 +3,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 //
 // Project Settings > Game > MiniGame Setting 에서 편집한다.
-// 레벨 이름(예: L_BurgerHouse)을 키로, 들어오자마자 띄울 미니게임과 시작 위치·보상을 적는다.
+// 레벨 이름(예: L_ConvenienceStore)을 키로, 들어오자마자 띄울 미니게임과 시작 위치·보상을 적는다.
+// 본편 대화의 StartMiniGame 액션은 레벨 이동 없이 이 키(예: Burger)로 지금 레벨에서 바로 띄운다.
 // 레벨에 액터를 놓지 않으므로 다른 사람 맵 파일을 저장할 필요가 없다.
 
 #pragma once
@@ -21,7 +22,7 @@ class FEBRICULA_API UMiniGameSettings : public UDeveloperSettings
 public:
 	UMiniGameSettings();
 
-	/** 키: 레벨 애셋 이름 (경로 없이, 예: L_BurgerHouse) */
+	/** 키: 레벨 애셋 이름 (경로 없이, 예: L_ConvenienceStore) 또는 StartMiniGame 액션이 쓰는 이름 (예: Burger) */
 	UPROPERTY(EditAnywhere, Config, BlueprintReadOnly, Category = "MiniGame")
 	TMap<FName, FMiniGameLevelEntry> Levels;
 

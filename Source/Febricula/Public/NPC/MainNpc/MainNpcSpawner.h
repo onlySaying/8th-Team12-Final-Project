@@ -82,7 +82,7 @@ struct FMainNpcSpawnRow : public FTableRowBase
 	 */
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MainNpc|Location")
-	ESpawnPointType	SpawnPointType;
+	ESpawnPointType	SpawnPointType = ESpawnPointType::OneByOne;
 	
 	/** 그 레벨에 배치한 AMainNpcSpawnPoint의 SpawnPointId */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MainNpc|Location", meta = (EditCondition = "SpawnPointType != ESpawnPointType::MultiByRandom"))
