@@ -2568,8 +2568,11 @@ void USubNpcDirectorSubsystem::UpdateAvoidance()
 		: MaxAvoidancePairs;
 
 	// 가까이 보이는 개체만 모은다. 여기가 회피 비용을 결정한다.
+	// [skydodo] 2026-10-17 버그 수정: 예산을 넘으면 ActiveNpcs 순서대로 앞 PairBudget명만 남겨,
+	// 200명 장면에서 화면 바로 앞 사람이 회피(그리고 남의 장애물 목록)에서 통째로 빠져 마주 오는 무리가 엉켰다.
+	// 후보를 전부 모은 뒤 시점에서 가까운 순으로 PairBudget명을 남긴다.
 	TArray<ASubNpcCharacter*> Nearby;
-	Nearby.Reserve(PairBudget);
+	Nearby.Reserve(ActiveNpcs.Num());
 
 	for (ASubNpcCharacter* Npc : ActiveNpcs)
 	{
@@ -2593,10 +2596,16 @@ void USubNpcDirectorSubsystem::UpdateAvoidance()
 		}
 
 		Nearby.Add(Npc);
-		if (Nearby.Num() >= PairBudget)
+	}
+	if (Nearby.Num() > PairBudget)
+	{
+		const FVector2D View(ViewerLocation);
+		Nearby.Sort([&View](const ASubNpcCharacter& A, const ASubNpcCharacter& B)
 		{
-			break;
-		}
+			return FVector2D::DistSquared(FVector2D(A.GetActorLocation()), View)
+				< FVector2D::DistSquared(FVector2D(B.GetActorLocation()), View);
+		});
+		Nearby.SetNum(FMath::Max(PairBudget, 0), EAllowShrinking::No);
 	}
 
 	// ---- 플레이어 접촉 ---------------------------------------------------------
