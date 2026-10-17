@@ -186,7 +186,9 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ### 원경 인스턴싱과 Mass 병렬화 — 애니메이션 워커 −46%
 
-![원경 인스턴싱](Docs/images/crowd_far_instancing_2026-10-17.png)
+[![원경 인스턴싱](Docs/images/crowd_far_instancing_2026-10-17.png)](https://www.youtube.com/watch?v=ZyXU0DJHRAo)
+
+[▶ 원경 인스턴싱 영상 — 200명, 켬 · 끔 · 다시 켬](https://www.youtube.com/watch?v=ZyXU0DJHRAo)
 
 40 m 밖 행인은 스켈레탈 메시를 숨겨 애니메이션 계산을 멈추고, 걷기 · 대기를 텍스처로 구운(AnimToTexture) 인스턴스드 메시 한 장으로 그립니다.
 
