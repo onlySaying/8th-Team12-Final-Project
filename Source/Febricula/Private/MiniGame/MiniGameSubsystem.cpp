@@ -42,8 +42,9 @@ namespace MiniGameStart
 }
 
 // [skydodo] 2026-10-17 추가: 시연 영상용 일주일 흐름.
-// 1일차는 이야기대로 진행하고(저녁이 되면 다음 날로), 2일차부터는 아침에 바로 버스 정류장(알바 선택지)으로 보낸다.
-// 알바를 하나 끝내면 다음 날 정류장으로, 4일차 알바까지(알바 3개) 끝나면 게임을 끈다.
+// 1일차는 이야기대로 진행하고(저녁이 되면 다음 날로), 2일차부터는 방에서 깨면
+// DT_MainStroyEvent의 DemoWorkDay 대화가 방과후 시간대(행동력)로 맞추고 버스 정류장(알바 선택지)으로 보낸다.
+// 알바를 하나 끝내면 다음 날 방으로, 4일차 알바까지(알바 3개) 끝나면 게임을 끈다.
 namespace DemoFlow
 {
 	constexpr int32 LastStoryDay = 1;
@@ -75,7 +76,7 @@ namespace DemoFlow
 		}
 	}
 
-	/** 다음 날 아침으로 넘기고, 이야기 기간이면 방 · 알바 기간이면 정류장에서 시작한다 */
+	/** 다음 날 아침으로 넘기고 방에서 시작한다 */
 	static void GoNextDay(UWorld* World)
 	{
 		UTimeSubsystem* Time = GetTime(World);
@@ -85,7 +86,7 @@ namespace DemoFlow
 		}
 		Time->ResetSchedule();
 		UE_LOG(LogMiniGame, Log, TEXT("[시연] %d일차로 넘김"), Time->GetAbsoluteDay());
-		OpenLevelByKey(World, Time->GetAbsoluteDay() > LastStoryDay ? FName(TEXT("MiddleBus")) : FName(TEXT("Room")));
+		OpenLevelByKey(World, TEXT("Room"));
 	}
 
 	static void OnLevelStarted(UWorld& World, FName LevelKey)
@@ -96,20 +97,12 @@ namespace DemoFlow
 			return;
 		}
 
-		if (Time->GetAbsoluteDay() > LastStoryDay)
+		// 1일차가 끝나는 순간 2일차 이야기가 먼저 걸리지 않도록 처음부터 완료 처리해 둔다
+		if (UGameProgressSubsystem* Progress = World.GetGameInstance()->GetSubsystem<UGameProgressSubsystem>())
 		{
-			if (UGameProgressSubsystem* Progress = World.GetGameInstance()->GetSubsystem<UGameProgressSubsystem>())
+			for (const TCHAR* EventId : SkippedStoryEvents)
 			{
-				for (const TCHAR* EventId : SkippedStoryEvents)
-				{
-					Progress->MarkEventCompleted(EventId);
-				}
-			}
-			// 알바 기간에 방에서 깨면 바로 정류장으로
-			if (LevelKey == TEXT("Room"))
-			{
-				OpenLevelByKey(&World, TEXT("MiddleBus"));
-				return;
+				Progress->MarkEventCompleted(EventId);
 			}
 		}
 
