@@ -237,8 +237,8 @@ Mass 이동 병렬화(계산은 워커 스레드, 적용만 게임 스레드)는
 
 | 햄버거집 | 꽃집 | 편의점 |
 |---|---|---|
-| ![햄버거집](Docs/images/minigame_burger_2026-10-17.png) | ![꽃집](Docs/images/minigame_flower.png) | ![편의점](Docs/images/minigame_convenience.png) |
-| 주문대로 쌓기 · 급여 + 손재주 | 같은 꽃 합치기 · 급여 + 체력 | 진상 손님 사이에서 버티기 · 급여 + 말솜씨 |
+| [![햄버거집](Docs/images/minigame_burger_2026-10-17.png)](https://www.youtube.com/watch?v=RIz6nXd6qcw) | ![꽃집](Docs/images/minigame_flower.png) | ![편의점](Docs/images/minigame_convenience.png) |
+| 주문대로 쌓기 · 급여 + 손재주<br>[▶ 플레이 영상](https://www.youtube.com/watch?v=RIz6nXd6qcw) | 같은 꽃 합치기 · 급여 + 체력 | 진상 손님 사이에서 버티기 · 급여 + 말솜씨 |
 
 ### 공통 프레임워크
 
