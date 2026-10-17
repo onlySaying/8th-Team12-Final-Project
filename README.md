@@ -1,9 +1,8 @@
 # 🌙 미열 (Febricula) — a quiet game
 
-> **언리얼 엔진 5.8 · C++ · 비주얼 노벨 + 육성 시뮬레이션**  
-> 내일배움캠프 Unreal 8기 Team 12 최종 프로젝트 · 4인 팀 (이지민 · 이상기 · 김태인 · 홍성돈)
+> **언리얼 엔진 5.8 · C++ · 비주얼 노벨 + 육성 시뮬레이션**
 
-[![전체 플레이 영상](https://img.youtube.com/vi/-BC5MXXjaro/0.jpg)](https://www.youtube.com/watch?v=-BC5MXXjaro)
+[▶ 전체 플레이 영상](https://www.youtube.com/watch?v=-BC5MXXjaro)
 
 ---
 
