@@ -39,6 +39,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame")
 	TSoftObjectPtr<UWorld> TargetLevel;
 
+	/**
+	 * [skydodo] 2026-10-18 추가: 비우지 않으면 레벨을 옮기지 않고 지금 레벨에서 이 미니게임을 띄운다 (TargetLevel보다 우선).
+	 * MiniGame Setting의 키를 쓴다 (예: Burger, Flower, L_ConvenienceStore)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame")
+	FName MiniGameKey;
+
 	/** 상호작용 프롬프트 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame")
 	FText Prompt;

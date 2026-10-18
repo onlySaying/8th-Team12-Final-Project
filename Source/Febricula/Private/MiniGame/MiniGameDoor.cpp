@@ -46,7 +46,7 @@ void AMiniGameDoor::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	FText Shown = Label.IsEmpty() ? Prompt : Label;
-	if (TargetLevel.IsNull())
+	if (TargetLevel.IsNull() && MiniGameKey.IsNone())
 	{
 		Shown = FText::FromString(Shown.ToString() + TEXT(" (TargetLevel 없음)"));
 	}
@@ -67,7 +67,12 @@ bool AMiniGameDoor::CanInteract_Implementation(AActor* Interactor) const
 	{
 		if (GameProgressSubsystem->EvaluateConditions(InteractConditions))
 		{
-			return !TargetLevel.IsNull() && !bTraveling;		
+			if (!MiniGameKey.IsNone())
+			{
+				const UMiniGameSubsystem* MiniGame = GetWorld()->GetSubsystem<UMiniGameSubsystem>();
+				return MiniGame && !MiniGame->IsMiniGameActive();
+			}
+			return !TargetLevel.IsNull() && !bTraveling;
 		}
 	}
 	return false;
@@ -77,6 +82,11 @@ void AMiniGameDoor::Interact_Implementation(AActor* Interactor)
 {
 	if (UMiniGameSubsystem* MiniGame = GetWorld()->GetSubsystem<UMiniGameSubsystem>())
 	{
+		if (!MiniGameKey.IsNone())
+		{
+			MiniGame->StartHere(MiniGameKey);
+			return;
+		}
 
 		if (TargetLevel.IsNull() || bTraveling)
 		{

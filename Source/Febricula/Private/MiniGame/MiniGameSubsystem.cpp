@@ -295,6 +295,7 @@ bool UMiniGameSubsystem::StartHere(FName EntryKey)
 	ActiveEntry = *Entry;
 	ActiveLevelKey = EntryKey;
 	bHasEntry = true;
+	bStartedHere = true;
 	StartAttempts = 0;
 	World->GetTimerManager().SetTimer(StartTimer, this, &UMiniGameSubsystem::TryStart, MiniGameStart::RetryInterval, true, MiniGameStart::StartHereDelay);
 	return true;
@@ -567,8 +568,18 @@ void UMiniGameSubsystem::EndMiniGame()
 		PC->ResetIgnoreLookInput();
 	}
 
-	if (World && DemoFlow::OnMiniGameEnded(World, ActiveLevelKey))
+	// [skydodo] 2026-10-18 수정: 지금 레벨에서 띄운 미니게임은 ActiveLevelKey가 미니게임 키(Burger 등)라
+	// 레벨 판정은 실제 레벨 이름으로 한다 (테스트 맵에서 끝내도 본편처럼 방으로 보내던 문제)
+	if (World && DemoFlow::OnMiniGameEnded(World, GetLevelShortName(*World)))
 	{
+		bStartedHere = false;
+		return;
+	}
+
+	// 레벨 이동 없이 띄운 미니게임은 끝나도 그 레벨에 그대로 남는다
+	if (bStartedHere)
+	{
+		bStartedHere = false;
 		return;
 	}
 

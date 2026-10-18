@@ -119,6 +119,9 @@ private:
 	FName ActiveLevelKey;
 	bool bHasEntry = false;
 
+	/** StartHere로 레벨 이동 없이 띄웠다 - 끝나면 들어오기 전 레벨로 돌아가지 않는다 */
+	bool bStartedHere = false;
+
 	UPROPERTY(Transient)
 	TObjectPtr<UMiniGameWidget> ActiveWidget;
 
