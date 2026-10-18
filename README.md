@@ -2,7 +2,9 @@
 
 > **언리얼 엔진 5.8 · C++ · 비주얼 노벨 + 육성 시뮬레이션**
 
-[▶ 전체 플레이 영상](https://www.youtube.com/watch?v=-BC5MXXjaro)
+## ⬇ 다운로드
+
+**[⬇ 실행 파일 다운로드 (Windows, zip 933MB)](https://drive.google.com/file/d/1aP1OcL8d3HDHQjEuPE8-4bjrkX2OfJ7O/view?usp=sharing)** — 압축을 풀고 `Febricula/Febricula.exe` 실행
 
 ---
 
@@ -15,12 +17,26 @@
 |---|---|
 | 장르 | 비주얼 노벨 + 육성 |
 | 플랫폼 | PC (Windows) · 1인 |
-| 플레이 타임 | 약 10분 |
+| 플레이 타임 | 약 5~10분 (대사를 읽는 속도에 따라) |
 | 구현 범위 | 나흘 이야기 · 엔딩 3종 · 호감도 에필로그 2종 |
 
 - **스토리 파트** — 고시원 방 · 복도, 도서관, 시험장(학교 앞)을 오가며 대화가 진행됩니다. 선택지에 따라 대답과 호감도가 바뀝니다.
-- **선택 파트** — 2·3일차 아침마다 도서관(공부)과 알바(미니게임 3종) 중 하나를 고르고, 그 조합으로 시험 결과와 엔딩이 갈립니다.
-- **엔딩** — 공부 2번(A) · 알바 2번(B) · 반반(C). 서윤 · 도윤 호감도가 높으면 엔딩 뒤에 한 줄씩 에필로그가 붙고, 끝나면 타이틀로 돌아가 새 게임으로 초기화됩니다.
+- **선택 파트** — 2·3일차 아침마다 방문을 나서며 도서관(공부)과 알바(미니게임 3종) 중 하나를 고르고, 그 조합으로 시험 결과와 엔딩이 갈립니다.
+- **연출** — 매일 아침 "N일차 / 시험까지 며칠", 엔딩 끝에는 엔딩 이름을 검은 카드로 띄웁니다.
+- **엔딩** — 2·3일차에 도서관에 간 횟수로 시험 결과와 엔딩이 정해지고, 호감도로 에필로그가 붙습니다. 끝나면 타이틀로 돌아가 새 게임으로 초기화됩니다.
+
+| 엔딩 | 조건 (2·3일차 선택) | 결과 |
+|---|---|---|
+| A — 냉장고의 채점표 | 도서관 2번 | 평균 82점 합격 |
+| B — 서랍 속 통장 | 알바 2번 | 2점 차 불합격, 8월 시험 재도전 |
+| C — 둘 다 반 | 도서관 1번 + 알바 1번 | 67점 합격, 방값은 절반 |
+
+| 에필로그 | 조건 |
+|---|---|
+| 도서관 그 자리에 놓고 온 커피 | 서윤 호감도 일정 이상 (1일차 선택 + 도서관 대화) |
+| 방문 앞의 편의점 도시락 | 도윤 호감도 일정 이상 (1일차 복도에서 "필요해요") |
+
+**조작** — `WASD` 이동 · 마우스 시점 · `E` 상호작용 / 대사 넘기기 · 마우스 클릭 선택지
 
 ---
 
@@ -33,21 +49,22 @@
 | **메인 NPC** | 스케줄 배치 스포너, 순찰 · 안내 Behavior Tree |
 | **군중 시스템** | 수백 명의 행인 이동 · 회피 · LOD, MassEntity 도입, 측정 기반 최적화 (−73%, −46%) |
 | **알바 미니게임** | 햄버거집 · 꽃집 · 편의점 미니게임 3종과 공통 프레임워크 |
-| **본편 흐름** | 나흘 시나리오 · 엔딩 분기 데이터, 목표 표시(화살표 + 문구), 타이틀 복귀 · 새 게임 초기화 |
+| **본편 흐름** | 나흘 시나리오 · 엔딩 분기 데이터, 목표 표시(화살표 + 문구), 날짜 · 엔딩 카드, 타이틀 복귀 · 새 게임 초기화 |
+| **시연 · 배포** | 자동 플레이(`-AutoPlay=A/B/C`)로 시연 영상 녹화, Shipping 패키징 · 검증 |
 
 ---
 
 ## 💬 대화 시스템
 
-![대화 이벤트](Docs/images/dialogue_hud_2026-10-17.png)
+![대화와 선택지](Docs/images/dialogue_choice_2026-10-18.png)
 
 `UDialogueSubsystem`(Tickable World Subsystem)이 게임의 모든 대사와 연출을 맡습니다. 화면에 대사를 띄우고 사운드와 연출을 실행합니다.
 
 - 이벤트 테이블(`FNpcEventRow`)에서 조건에 맞는 Row를 고르고, 그 Row가 가리키는 대화 노드(`FDialogueNodeRow`)를 실행
-- 노드는 Branch(자동 분기)와 Choice(선택지)를 갖고, 각각 조건(`FGameCondition`)과 결과(`FGameAction`, 45종)를 가짐
+- 노드는 Branch(자동 분기)와 Choice(선택지)를 갖고, 각각 조건(`FGameCondition`)과 결과(`FGameAction`, 47종)를 가짐
 - **이벤트 선택** — 조건 충족 + 최고 우선순위, 동점이면 테이블 순서
 - **여러 NPC 동시 등장** — 참가자 전원 순찰 중지 → 대화 후 한꺼번에 해제
-- **자리별 대화** — 같은 NPC라도 교실과 옥상에서 다른 대사
+- **자리별 대화** — 같은 NPC라도 만난 장소와 진행 상황에 따라 다른 대사 (예: 서윤은 도서관 첫 방문과 두 번째 방문에서 다른 대화)
 
 ```cpp
 // 조건을 만족하는 이벤트 중 Priority가 가장 높은 것
@@ -68,26 +85,39 @@ EnterTalkForParticipants(Participants, InInstigator);
 **대화 HUD** — `UPlayerHUDWidget`(C++)이 대화 서브시스템의 델리게이트를 받고, 화면 모양은 `WBP_PlayerHUD`가 맡습니다.
 - 프롬프트 · 대화창 · 선택지 · 초상화를 한 위젯의 레이어로 쌓아, 선택지가 대화창 뒤에 깔리는 문제를 막음
 - 반투명 둥근 카드 대화창, 이름표 태그(화자가 없으면 나레이션처럼 숨김), 다음 표시(▼)
-- 선택지는 조건(`FGameCondition`)을 만족하지 못하면 회색 · 클릭 불가로 표시 (위 이미지의 "잠긴 선택지")
+- 선택지는 조건(`FGameCondition`)을 만족하지 못하면 회색 · 클릭 불가로 표시
 
 **테스트 도구**
 
 | 명령 · 데이터 | 용도 |
 |---|---|
+| `-AutoPlay=A\|B\|C` (실행 옵션) | 타이틀부터 엔딩까지 자동 진행 — 엔딩별 회귀 테스트 · 시연 녹화 · 패키징 빌드 검증 |
+| `DialogueChoose N` | 떠 있는 선택지 중 N번 선택 (키 입력 없이 분기 확인) |
+| `MiniGameFinish [점수]` | 진행 중인 미니게임을 바로 끝내고 보상 · 귀가 흐름 확인 |
 | `dialogue.TalkNpc [NpcId]` | 키 입력 없이 지정한(없으면 가장 가까운) 메인 NPC와 대화 시작 |
-| `DT_MiniGameTestEvents` · `DT_MiniGameTestDialogue` | 테스트 맵 전용 대화 → 선택지 → AP 소모까지 한 번에 확인 |
-| 테스트 맵 AP 보충 | `L_MiniGameTest`에서는 시간대와 상관없이 AP 3으로 시작 (Shipping 제외) |
+
+![목표 표시 — 머리 위 화살표와 왼쪽 위 목표 문구](Docs/images/objective_marker_2026-10-18.png)
 
 **목표 표시** — 플레이 테스트에서 "어디로 가서 무엇과 상호작용해야 하는지 모르겠다"는 피드백이 나와 추가했습니다.
 - 대사 데이터의 `SetObjective` 액션 한 줄로 대상(NpcId 또는 액터 태그) 머리 위에 화살표를 띄우고, 화면 왼쪽 위에 목표 문구를 씀
 - 목표는 `UObjectiveSubsystem`(Tickable World Subsystem)이 들고 있어 레벨이 바뀌면 자연히 사라짐 → 지우는 걸 깜빡해 다음 장면에 화살표가 남는 일이 없음
 - 걸어가야 하는 장면은 기존 자동 진행(`WhenPlayerNearNpc`)과 묶어 "화살표를 따라가 다가가면 대화 시작"으로 만듦
 
+![날짜 카드와 엔딩 카드](Docs/images/title_cards_2026-10-18.png)
+
+**날짜 · 엔딩 카드** — 대사 액션 `ShowTitleCard` 한 줄로 검은 화면에 큰 제목과 부제를 띄웠다가 사라지게 합니다. 위젯 에셋 없이 C++로 위젯 트리를 만들어, 대본만 고쳐서 카드 문구를 바꿀 수 있습니다.
+
 **대사 스크립트** — 대본은 텍스트(`Data/DT_StoryDialogue.txt`)로 쓰고, 파서가 대화 테이블 행으로 바꿉니다. 화자 · 선택지 · 분기 · 액션을 한 파일에서 읽을 수 있어 대본 수정이 에디터 작업 없이 끝납니다.
 
-**트러블슈팅 — 주말이 지나면 날짜가 초기화돼 이벤트가 어긋남**
-- 원인: 주 단위 상대 날짜로 주말을 판정했고, 초기화되지 않은 값이 남아 있었음
-- 해결: 절대 일차 기준으로 계산하고, 날짜 테스트 테이블로 검증
+**트러블슈팅 — 달이 바뀌면 평일 · 주말이 뒤집혀 그날 이벤트가 안 뜸** (팀원이 만든 시간 시스템 `UTimeSubsystem` 수정)
+
+| 증상 | 원인 | 수정 |
+|---|---|---|
+| 달이 바뀐 뒤 평일에 주말 시간표가 나오거나 그 반대 → 날짜 조건 이벤트가 엇갈림 | 주말을 `NowDay % 7`로 판정했는데 `NowDay`는 매달 1로 돌아감. 31일 다음 1일이면 요일이 그대로 이어지지 않음 | 달과 상관없이 계속 늘어나는 `AbsoluteDay`를 두고 `IsWeekend()` 한 곳에서 `(AbsoluteDay - 1) % 7`로 판정. 같은 계산이 흩어져 있던 곳을 모두 이 함수로 통일 |
+| 날짜를 넘기는 순간 평일·주말 시간표가 섞일 수 있음 | 날짜를 넘기면(`SpendDay`) 평일 ↔ 주말 시간표 배열이 바뀌는데, 넘기기 전에 잡아 둔 배열 참조를 그대로 씀 | 날짜를 넘긴 뒤 시간표 배열을 다시 가져오도록 순서 변경 |
+| 시간표 에셋이 비어 있으면 잘못된 메모리 접근 | 비었는지 확인하지 않고 `ScheduleDefs[0]`을 바로 읽음 · 초기화하지 않은 값이 남음 | 빈 에셋 검사와 로그 추가, 모든 값 초기화 |
+
+검증은 날짜 테스트 테이블(`DT_Dialogue_DayTest`)로 달이 넘어가는 구간의 요일 · 시간표를 하나씩 확인했습니다.
 
 **트러블슈팅 — 분기 조건이 하나도 맞지 않으면 그 뒤 대사가 통째로 사라짐**
 - 원인: 대사 스크립트는 `@branch` 뒤의 `@jump`를 "그 외의 경우"로 쓰는데, 런타임은 분기가 하나라도 있으면 다음 노드를 보지 않고 대화를 끝냄 (알바를 안 한 밤에 침대 목표가 안 뜸)
@@ -97,15 +127,25 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ## 🖐 상호작용 시스템
 
-![상호작용 프롬프트](Docs/images/interaction_prompt_2026-10-17.png)
+![방문 상호작용 — 아침에만 열리는 문](Docs/images/interaction_door_2026-10-18.png)
 
-**문제** — 문과 소품 같은 오브젝트마다 상호작용 처리가 달라, 새 오브젝트를 일관된 방식으로 붙일 수 없었습니다.
+**배경** — 상호작용은 플레이어 캐릭터(팀원 담당)가 완성되기 전에 만들어야 했고, 그 캐릭터 코드는 건드리지 않고 붙일 수 있어야 했습니다.
 
-**해결** — `IInteractable` 인터페이스(`CanInteract` · `Prompt` · `Interact`)와 플레이어 쪽 `UInteractionComponent`로 구조를 바꿨습니다.
+**설계** — 캐릭터 클래스에는 상호작용 로직을 한 줄도 넣지 않고 세 조각으로 나눴습니다.
+- **탐색**: Pawn에 붙이는 `UInteractionComponent` → 어떤 캐릭터든 컴포넌트만 추가하면 동작
+- **규칙**: `IInteractable` 인터페이스(`CanInteract` · `Prompt` · `Interact`) → 대상 쪽이 "지금 되는지 · 뭐라고 보일지 · 누르면 뭘 할지"를 정함
+- **결과**: 사물(`AInteractableProp`)이 대사 · 액션 데이터를 직접 들고 있음(Prop Action) → 새 상호작용은 데이터만 채우면 되고 캐릭터 코드는 바뀌지 않음
+
+**동작**
 - 대상은 인터페이스만 구현하면 자동으로 탐색됨 → NPC, 소품, 문, 미니게임 문을 같은 방식으로 처리
 - 포커스 선택 순서: 반경 내 오버랩 → 인터페이스 구현 → `CanInteract` → 정면 각도 통과 → 가장 가까운 대상
 - 포커스가 바뀔 때만 HUD를 갱신하고, 대화 중에는 탐색을 멈춰 프롬프트 깜빡임을 방지
 - 어떤 Pawn에든 컴포넌트만 붙이면 동작 → 이후 추가된 미니게임 문은 **추가 코드 없이** 자동 감지
+- **지금 누를 수 있을 때만 문구 표시** — 사물에 `bOnlyWhenEventAvailable`을 켜면 연결된 이벤트의 시작 조건을 만족할 때만 "E - 나가기"가 뜸 (방문은 2·3일차 아침에만 열림)
+
+**트러블슈팅 — 눌러도 아무 일 없는 "조사하기"**
+- 원인: 이전 스토리의 이동 이벤트가 연결된 문 8개와 테스트 문구가 남은 의자. `CanInteract`는 "연결된 노드가 있다"만 보고 참을 돌려, 이벤트가 지워진 뒤에도 문구가 떴음
+- 해결: 쓰지 않는 상호작용 설정을 비우고, 이벤트로 열리는 사물은 위의 `bOnlyWhenEventAvailable`로 조건까지 확인
 
 ---
 
@@ -113,7 +153,7 @@ EnterTalkForParticipants(Participants, InInstigator);
 
 ![메인 NPC 스케줄 배치 흐름](Docs/images/mainnpc_schedule_flow.svg)
 
-**스케줄 배치 스포너** — 기획자가 표(`FMainNpcSpawnRow`)만 고쳐서 "1일차 아침엔 교실, 신뢰 이상이면 옥상"을 정합니다.
+**스케줄 배치 스포너** — 기획자가 표(`FMainNpcSpawnRow`)만 고쳐서 "몇 일차 어느 시간대엔 어디, 호감도가 높으면 다른 자리"를 정합니다.
 
 | 누가 | 언제 | 조건 | 어디 |
 |---|---|---|---|
@@ -295,6 +335,22 @@ Mass 이동 병렬화(계산은 워커 스레드, 적용만 게임 스레드)는
 
 ---
 
+## 🎬 시연 자동화 · 패키징
+
+**자동 플레이** — `-AutoPlay=A|B|C`로 실행하면 타이틀부터 엔딩까지 사람 없이 진행합니다 (`UDemoAutoPlaySubsystem`). 시연 영상 녹화와 패키징 빌드 검증에 씁니다.
+- 목표 화살표 대상까지 길찾기 경로를 따라 걷고, 대사는 글자 수만큼 기다렸다 넘기고, 선택지는 경로별 순서대로 고름
+- 엔딩 후 타이틀로 돌아오면 게임을 종료 → 로그가 없는 Shipping 빌드도 "정상 종료 = 끝까지 진행"으로 검증
+
+**트러블슈팅 — 자동 플레이 캐릭터가 미끄러지듯 이동**
+- 원인: `SimpleMoveToLocation`은 가속도 없이 속도만 바꿔, 가속도를 보고 걷기를 고르는 애니메이션이 대기 자세로 남음
+- 해결: 길찾기로 경로만 구하고 이동은 플레이어 입력과 같은 `AddMovementInput`으로 줌
+
+**트러블슈팅 — 패키징 빌드에서 미니게임 화면이 비어 보임**
+- 원인: 미니게임 텍스처 · 효과음을 C++에서 경로로 불러와, 맵 참조만 따라가는 쿠킹에 포함되지 않음 (에디터에서는 정상)
+- 해결: 해당 폴더를 `DirectoriesToAlwaysCook`에 추가하고, 패키지 파일 목록(Manifest)으로 포함 여부를 확인
+
+---
+
 ## 🤖 AI 활용 (Claude Code + Unreal MCP)
 
 AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까지 기록했습니다.
@@ -320,6 +376,8 @@ AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까�
 | [`MiniGameSubsystem.cpp`](Source/Febricula/Private/MiniGame/MiniGameSubsystem.cpp) | 미니게임 공통 프레임워크, 본편 흐름(알바 후 귀가 · 새 게임 초기화) |
 | [`ObjectiveSubsystem.cpp`](Source/Febricula/Private/Objective/ObjectiveSubsystem.cpp) | 목표 표시: 대상 찾기 · 화살표 · 화면 문구 |
 | [`DT_StoryDialogue.txt`](Data/DT_StoryDialogue.txt) | 본편 대본 (나흘 · 엔딩 3종) |
+| [`TitleCardWidget.cpp`](Source/Febricula/Private/UI/TitleCardWidget.cpp) | 날짜 · 엔딩 카드 위젯 |
+| [`DemoAutoPlaySubsystem.cpp`](Source/Febricula/Private/Demo/DemoAutoPlaySubsystem.cpp) | 시연 녹화 · 빌드 검증용 자동 플레이 |
 
 ---
 
@@ -329,5 +387,15 @@ AI 초안 → 직접 검증과 판단 → 수치로 확인. 거절한 제안까�
 |---|---|---|
 | 행인 남학생 | [Rigged Anime Japanese High School Boy](https://sketchfab.com/3d-models/845df0101cd5429e86b190be757d1365) — suzuart (Sketchfab) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | 행인 여학생 | [Stylized Anime Japanese High School Girl 6](https://sketchfab.com/3d-models/a9a4ea84dc7844d3bf5d870a1d59b061) — suzuart (Sketchfab) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| 주인공 · 서윤 · 도윤 등 메인 캐릭터 | [suzuart](https://sketchfab.com/suzuart) 작가의 애니메 학생 캐릭터 모델 (Sketchfab) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| 하늘 · 시간대 | [Ultra Dynamic Sky](https://www.fab.com/listings/84fda27a-c79f-49c9-8458-82401fb37cfb) — Everett Gunther (Fab) | Fab Standard License |
+| 이동 애니메이션 | [Male Locomotion Set](https://www.fab.com/listings/ad171f97-21c2-40c1-a9ad-1e474e9b2ae2) · [Female Locomotion Set](https://www.fab.com/listings/e111d3ee-26f2-496f-bd1c-72884ede5f3d) — [VanillaLoop](https://www.fab.com/sellers/VanillaLoop) (Fab) | Fab Standard License |
+| 보행 애니메이션 | [Pedestrian Walks - MoCap Pack](https://www.fab.com/listings/cb5bf914-49ff-4514-aba8-e038814cac73) — MoCap Online (Fab) | Fab Standard License |
+| 행인 행동 애니메이션 | [Mixamo](https://www.mixamo.com/) (Reaching Out · Sitting Talking · Texting 등) — Adobe | Mixamo 이용 약관 |
+| 대화 애니메이션 | Fab 대화(Talk) 애니메이션 팩 | Fab Standard License |
+| 마네킹 · 템플릿 | Unreal Engine 기본 콘텐츠 (Manny · Quinn, Third Person / Level Prototyping) — Epic Games | Unreal Engine EULA |
+| 소품 재질 일부 | [ambientCG](https://ambientcg.com/) (Plastic006 · Plastic011) | [CC0](https://docs.ambientcg.com/license/) |
+| 고시원 · 도서관 · 복도 · 학교 레벨 모델 | 팀 자체 제작 | — |
+| 대화 초상화 · 미니게임 그림 · UI 이미지 | AI 생성 | — |
 
-두 모델 모두 Mixamo로 리깅한 뒤 Manny 애니메이션을 IK 리타깃해 사용했습니다.
+suzuart 작가의 모델은 Mixamo로 리깅한 뒤 Manny 애니메이션을 IK 리타깃해 사용했습니다.
