@@ -1,5 +1,9 @@
 # 원경 행인 메시 다시 굽기 (AnimToTexture)
 
+성능 수치는 [서브NPC_성능측정_기록](서브NPC_성능측정_기록.md) 9장 · [CrowdPerformance.md](CrowdPerformance.md).
+
+> **참고** 2026-10-17 행인이 남녀 학생 모델(`BP_Passerby_Boy` / `BP_Passerby_Girl`)로 바뀌면서 원경 데이터(`FarCrowdAnimData`)를 행인 BP마다 따로 지정하고, 원경 인스턴서도 데이터별로 만든다. 아래 Manny 기준 설명은 굽는 절차로 읽는다.
+
 멀리 있는 행인(`crowd.FarInstanceDistance`, 기본 40m 밖)은 스켈레탈 메시 대신 인스턴스드 스태틱 메시 + 텍스처로 구운 애니메이션으로 그린다.
 이 데이터는 `/Game/NPC/SubNpc/FarCrowd`에 있다. 행인 전용 복사본이고, 엔진 샘플과 팀 공용 에셋은 건드리지 않는다.
 
