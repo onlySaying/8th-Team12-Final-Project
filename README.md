@@ -95,6 +95,8 @@ EnterTalkForParticipants(Participants, InInstigator);
 | `DialogueChoose N` | 떠 있는 선택지 중 N번 선택 (키 입력 없이 분기 확인) |
 | `MiniGameFinish [점수]` | 진행 중인 미니게임을 바로 끝내고 보상 · 귀가 흐름 확인 |
 | `dialogue.TalkNpc [NpcId]` | 키 입력 없이 지정한(없으면 가장 가까운) 메인 NPC와 대화 시작 |
+| `DT_MiniGameTestEvents` · `DT_MiniGameTestDialogue` | 테스트 맵 전용 대화 → 선택지 → AP 소모까지 한 번에 확인 |
+| 테스트 맵 AP 보충 | `L_MiniGameTest`에서는 시간대와 상관없이 AP 3으로 시작 (Shipping 제외) |
 
 ![목표 표시 — 머리 위 화살표와 왼쪽 위 목표 문구](Docs/images/objective_marker_2026-10-18.png)
 
