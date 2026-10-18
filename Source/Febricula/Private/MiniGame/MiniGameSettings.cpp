@@ -17,6 +17,7 @@ UMiniGameSettings::UMiniGameSettings()
 	Burger.bUseFixedCamera = false;
 	Burger.BGM = TSoftObjectPtr<USoundBase>(FSoftObjectPath(TEXT("/Game/MiniGame/Burger/Audio/S_Burger_BGM.S_Burger_BGM")));
 	Burger.BGMVolume = 0.6f;
+	Burger.BackdropColor = FLinearColor::FromSRGBColor(FColor(222, 201, 168)); // 따뜻한 베이지 - 햄버거집 크림색 패널과 맞춤
 	Burger.MoneyReward = 40000;
 	Burger.RewardStat = TEXT("HandWork");
 	Burger.StatThresholds = { 3, 5, 7, 9 };
@@ -28,6 +29,7 @@ UMiniGameSettings::UMiniGameSettings()
 	Flower.WidgetClass = TSoftClassPtr<UMiniGameWidget>(FSoftObjectPath(TEXT("/Script/Febricula.FlowerMiniGameWidget")));
 	Flower.bMovePlayer = false;
 	Flower.bUseFixedCamera = false;
+	Flower.BackdropColor = FLinearColor::FromSRGBColor(FColor(212, 222, 200)); // 연한 세이지 그린 - 꽃집 패널 톤
 	Flower.MoneyReward = 30000;
 	Flower.RewardStat = TEXT("Health");
 	// 완료 주문 수 0~6건 +1, 7~9건 +2, 10~11건 +3, 12~13건 +4, 14건 이상 +5.
@@ -44,6 +46,7 @@ UMiniGameSettings::UMiniGameSettings()
 	Survivor.bUseFixedCamera = false;
 	Survivor.BGM = TSoftObjectPtr<USoundBase>(FSoftObjectPath(TEXT("/Game/MiniGame/Survivor/Audio/S_Survivor_BGM.S_Survivor_BGM")));
 	Survivor.BGMVolume = 0.45f;
+	Survivor.BackdropColor = FLinearColor::FromSRGBColor(FColor(214, 232, 222)); // 연한 민트 (화면을 다 덮지만 비는 가장자리 대비)
 	Survivor.FallbackReturnLevel = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/MiniGame/Maps/L_MiniGameTest.L_MiniGameTest")));
 	Survivor.MoneyReward = 30000;
 	Survivor.RewardStat = TEXT("Speech");

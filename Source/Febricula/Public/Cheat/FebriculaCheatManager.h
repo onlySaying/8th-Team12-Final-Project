@@ -58,4 +58,12 @@ public:
 	
 	UFUNCTION(Exec)
 	void TeleportDay(int32 Day);
+
+	/** [skydodo] 2026-10-18 추가: 지금 떠 있는 대화 선택지 중 Index(0부터)번째를 고른다 (본편 자동 플레이 테스트용) */
+	UFUNCTION(Exec)
+	void DialogueChoose(int32 Index);
+
+	/** [skydodo] 2026-10-18 추가: 진행 중인 미니게임을 Score 점수로 끝낸다 (보상 지급 → 본편 복귀까지) */
+	UFUNCTION(Exec)
+	void MiniGameFinish(int32 Score = 5);
 };

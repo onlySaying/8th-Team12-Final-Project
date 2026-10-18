@@ -22,6 +22,7 @@
 class APlayerController;
 class UAudioComponent;
 class UMiniGameWidget;
+class UMiniGameBackdropWidget;
 
 /** 레벨 이동 기록. 미니게임이 끝나면 들어오기 전 레벨로 돌려보낸다 */
 UCLASS()
@@ -120,6 +121,10 @@ private:
 
 	UPROPERTY(Transient)
 	TObjectPtr<UMiniGameWidget> ActiveWidget;
+
+	/** 미니게임 위젯 뒤에 까는 색지 (설정의 BackdropColor 알파가 0이면 없음) */
+	UPROPERTY(Transient)
+	TObjectPtr<UMiniGameBackdropWidget> Backdrop;
 
 	/** 미니게임 동안 쓰는 고정 카메라 (레벨에 놓지 않고 런타임에 만든다) */
 	UPROPERTY(Transient)

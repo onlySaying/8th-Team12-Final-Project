@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Dialogue/DialogueSubsystem.h"
 #include "GameMode/TimeSubsystem.h"
+#include "MiniGame/MiniGameSubsystem.h"
 #include "Progress/GameProgressSubsystem.h"
 
 void UFebriculaCheatManager::SkipDay(int32 Day)
@@ -198,3 +199,25 @@ void UFebriculaCheatManager::TeleportDay(int32 Day)
 	}
 }
 
+
+void UFebriculaCheatManager::DialogueChoose(int32 Index)
+{
+	if (UDialogueSubsystem* Dialogue = GetWorld()->GetSubsystem<UDialogueSubsystem>())
+	{
+		Dialogue->SelectChoice(Index, false);
+	}
+}
+
+void UFebriculaCheatManager::MiniGameFinish(int32 Score)
+{
+	UMiniGameSubsystem* MiniGame = GetWorld()->GetSubsystem<UMiniGameSubsystem>();
+	if (!MiniGame || !MiniGame->IsMiniGameActive())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MiniGameFinish: 진행 중인 미니게임이 없다"));
+		return;
+	}
+	FMiniGameResult Result;
+	Result.Score = Score;
+	MiniGame->GrantReward(Result);
+	MiniGame->EndMiniGame();
+}

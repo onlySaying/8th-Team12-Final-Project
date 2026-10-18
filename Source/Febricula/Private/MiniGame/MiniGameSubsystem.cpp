@@ -17,6 +17,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MiniGame/MiniGameSettings.h"
 #include "MiniGame/MiniGameWidget.h"
+#include "MiniGame/MiniGameBackdropWidget.h"
 #include "Misc/PackageName.h"
 #include "Progress/GameProgressSubsystem.h"
 #include "TimerManager.h"
@@ -423,6 +424,15 @@ void UMiniGameSubsystem::StartMiniGame(APlayerController* PC)
 			{
 				return;
 			}
+			if (ActiveEntry.BackdropColor.A > 0.f)
+			{
+				Backdrop = CreateWidget<UMiniGameBackdropWidget>(PC, UMiniGameBackdropWidget::StaticClass());
+				if (Backdrop)
+				{
+					Backdrop->SetColor(ActiveEntry.BackdropColor);
+					Backdrop->AddToViewport(49);
+				}
+			}
 			ActiveWidget->AddToViewport(50);
 
 			FInputModeUIOnly InputMode;
@@ -525,6 +535,11 @@ void UMiniGameSubsystem::EndMiniGame()
 	{
 		ActiveWidget->RemoveFromParent();
 		ActiveWidget = nullptr;
+	}
+	if (Backdrop)
+	{
+		Backdrop->RemoveFromParent();
+		Backdrop = nullptr;
 	}
 
 	if (BGMComponent)

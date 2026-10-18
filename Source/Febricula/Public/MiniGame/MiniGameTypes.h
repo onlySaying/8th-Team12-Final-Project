@@ -59,6 +59,13 @@ struct FMiniGameLevelEntry
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame|Sound", meta = (ClampMin = "0", ClampMax = "2"))
 	float BGMVolume = 0.6f;
 
+	/**
+	 * 미니게임 위젯 뒤에 화면 전체로 깔 색. 알파가 0이면 깔지 않는다.
+	 * 본편에서는 가게 맵 없이 지금 레벨에서 띄우므로, 반투명 패널 뒤가 검은 화면으로 비치지 않게 쓴다.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame")
+	FLinearColor BackdropColor = FLinearColor::Transparent;
+
 	/** 들어오기 전 레벨을 모를 때(이 레벨에서 바로 PIE를 켠 경우 등) 돌아갈 레벨 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MiniGame")
 	TSoftObjectPtr<UWorld> FallbackReturnLevel;
