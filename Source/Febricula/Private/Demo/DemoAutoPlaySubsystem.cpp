@@ -3,7 +3,8 @@
 
 #include "Demo/DemoAutoPlaySubsystem.h"
 
-#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Dialogue/DialogueSubsystem.h"
@@ -274,24 +275,45 @@ bool UDemoAutoPlaySubsystem::TickWalk(UWorld& World, float DeltaTime)
 		PC->StopMovement();
 	}
 
-	if (DirectMoveTime > 0.f)
+	// 길만 길찾기로 구하고, 움직임은 플레이어 입력과 같은 AddMovementInput으로 준다.
+	// (SimpleMoveToLocation은 가속도 없이 속도만 바꿔서 걷기 애니메이션이 안 나오고 미끄러져 보였다)
+	RepathTime -= DeltaTime;
+	if (RepathTime <= 0.f)
 	{
-		DirectMoveTime -= DeltaTime;
-		Character->AddMovementInput((To - From).GetSafeNormal2D(), 1.f);
-	}
-	else
-	{
-		RepathTime -= DeltaTime;
-		if (RepathTime <= 0.f)
+		RepathTime = 0.5f;
+		PathPoints.Reset();
+		if (const UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(&World, From, To, Character))
 		{
-			RepathTime = 1.f;
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(PC, To);
+			if (Path->IsValid())
+			{
+				PathPoints = Path->PathPoints;
+			}
 		}
 	}
 
-	// 카메라가 걷는 방향 뒤를 따라가게 (녹화 화면용)
+	FVector Goal = To;
+	if (DirectMoveTime > 0.f)
+	{
+		DirectMoveTime -= DeltaTime;
+	}
+	else
+	{
+		// 이미 지나온 경유점은 건너뛰고 다음 점을 향한다
+		for (const FVector& Point : PathPoints)
+		{
+			if (FVector::Dist2D(From, Point) > 60.f)
+			{
+				Goal = Point;
+				break;
+			}
+		}
+	}
+	Character->AddMovementInput((Goal - From).GetSafeNormal2D(), 1.f);
+
+	// 카메라가 걷는 방향 뒤를 따라가게 (녹화 화면용).
+	// 목표 바로 앞에서는 옆으로 꺾는 걸음에 카메라가 따라 돌아 좁은 복도 벽에 막히므로 돌리지 않는다
 	const FVector Velocity = Character->GetVelocity();
-	if (Velocity.SizeSquared2D() > 100.f)
+	if (Velocity.SizeSquared2D() > 100.f && Distance > 350.f)
 	{
 		const FRotator Current = PC->GetControlRotation();
 		const FRotator Wanted(Current.Pitch, Velocity.Rotation().Yaw, 0.f);

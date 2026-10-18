@@ -1140,6 +1140,12 @@
         "Value": 0
       },
       {
+        "Type": "Teleport",
+        "Key": "Player",
+        "Key2": "Story_HallEnding",
+        "Value": 0
+      },
+      {
         "Type": "FadeIn",
         "Key": "None",
         "Key2": "None",
@@ -2233,7 +2239,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "Morning_Choice",
+    "NextNodeId": "Morning_Room",
     "AutoAdvance": "AfterDelay",
     "AutoAdvanceValue": 2.6,
     "AutoAdvanceNpcId": "None",
@@ -2276,7 +2282,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "Morning_Choice",
+    "NextNodeId": "Morning_Room",
     "AutoAdvance": "AfterDelay",
     "AutoAdvanceValue": 2.6,
     "AutoAdvanceNpcId": "None",
@@ -2304,11 +2310,61 @@
     }
   },
   {
-    "Name": "Morning_Choice",
+    "Name": "Morning_Room",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
     "Text": "지갑에 든 돈으로는 이번 달 방값의 절반도 안 된다.",
-    "OnEnterActions": [],
+    "OnEnterActions": [
+      {
+        "Type": "SetObjective",
+        "Key": "Obj_RoomDoor",
+        "Key2": "방문으로_나가기",
+        "Value": 0
+      }
+    ],
+    "Choices": [],
+    "bYesNo": false,
+    "Branches": [],
+    "NextNodeId": "None",
+    "AutoAdvance": "None",
+    "AutoAdvanceValue": 0.0,
+    "AutoAdvanceNpcId": "None",
+    "bHideBoxWhileWaiting": false,
+    "Camera": {
+      "CameraType": "None",
+      "Location": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "Rotation": {
+        "Roll": 0.0,
+        "Pitch": 0.0,
+        "Yaw": 0.0
+      },
+      "MoveTime": 0.0,
+      "Focus": 100000.0
+    },
+    "SoundLocation": {
+      "SoundChannel": "",
+      "SoundName": "",
+      "Target": "",
+      "Blend": 0.0
+    }
+  },
+  {
+    "Name": "Morning_Choice",
+    "SpeakerName": "",
+    "SpeakerNpcId": "None",
+    "Text": "어디로 갈까.",
+    "OnEnterActions": [
+      {
+        "Type": "ClearObjective",
+        "Key": "None",
+        "Key2": "None",
+        "Value": 0
+      }
+    ],
     "Choices": [
       {
         "Text": "도서관에 간다",
@@ -2330,6 +2386,13 @@
         "Actions": [],
         "YesNo": false,
         "NextNodeId": "WorkMenu"
+      },
+      {
+        "Text": "조금 더 있다 나가자",
+        "Conditions": [],
+        "Actions": [],
+        "YesNo": false,
+        "NextNodeId": "Morning_Stay"
       }
     ],
     "bYesNo": false,
@@ -2365,7 +2428,7 @@
     "Name": "WorkMenu",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "어디로 갈까.",
+    "Text": "어느 알바로 갈까.",
     "OnEnterActions": [],
     "Choices": [
       {
@@ -2394,9 +2457,52 @@
         "Conditions": [],
         "Actions": [],
         "YesNo": false,
-        "NextNodeId": "Morning_Choice"
+        "NextNodeId": "Morning_Stay"
       }
     ],
+    "bYesNo": false,
+    "Branches": [],
+    "NextNodeId": "None",
+    "AutoAdvance": "None",
+    "AutoAdvanceValue": 0.0,
+    "AutoAdvanceNpcId": "None",
+    "bHideBoxWhileWaiting": false,
+    "Camera": {
+      "CameraType": "None",
+      "Location": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "Rotation": {
+        "Roll": 0.0,
+        "Pitch": 0.0,
+        "Yaw": 0.0
+      },
+      "MoveTime": 0.0,
+      "Focus": 100000.0
+    },
+    "SoundLocation": {
+      "SoundChannel": "",
+      "SoundName": "",
+      "Target": "",
+      "Blend": 0.0
+    }
+  },
+  {
+    "Name": "Morning_Stay",
+    "SpeakerName": "",
+    "SpeakerNpcId": "None",
+    "Text": "아직은 방에 있기로 했다.",
+    "OnEnterActions": [
+      {
+        "Type": "SetObjective",
+        "Key": "Obj_RoomDoor",
+        "Key2": "방문으로_나가기",
+        "Value": 0
+      }
+    ],
+    "Choices": [],
     "bYesNo": false,
     "Branches": [],
     "NextNodeId": "None",

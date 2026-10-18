@@ -99,6 +99,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prop")
 	bool bSingleUse = false;
 
+	/**
+	 * [skydodo] 2026-10-18 추가: 켜면 ConnectedEventTable에 DialogueNodeId로 시작하는 이벤트를
+	 * 지금 시작할 수 있을 때만 상호작용 문구를 띄운다 (예: 아침에만 열리는 방문)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prop")
+	bool bOnlyWhenEventAvailable = false;
+
 	/** 상호작용 시 함께 띄울 위젯 클래스. 비워두면 아무것도 열지 않는다 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Prop")
 	TSubclassOf<UUserWidget> InspectWidgetClass;

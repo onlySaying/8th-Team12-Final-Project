@@ -62,4 +62,7 @@ private:
 	float BestDistance = TNumericLimits<float>::Max();
 	float InteractCooldown = 0.f;
 	TWeakObjectPtr<AActor> WalkTarget;
+
+	/** 지금 목표까지의 길찾기 경유점 (0.5초마다 다시 구한다) */
+	TArray<FVector> PathPoints;
 };

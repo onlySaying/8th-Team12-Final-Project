@@ -99,6 +99,7 @@
 
 @label D1_Hallway
 @SpawnActor NPC_Doyun Story_HallDoyun
+@Teleport Player Story_HallEnding
 @FadeIn 1
 @SetObjective NPC_Doyun 복도의_사람
 밤 열 시. 3층 복도.
@@ -182,28 +183,41 @@
 @ShowTitleCard 2일차 시험까지_사흘 2
 @wait 2.6
 @hide
-@jump Morning_Choice
+@jump Morning_Room
 
 @label Morning_D3
 @ShowTitleCard 3일차 시험까지_이틀 2
 @wait 2.6
 @hide
-@jump Morning_Choice
+@jump Morning_Room
+
+// 방문(Obj_RoomDoor)을 가리키고 끝난다. 문을 누르면 이벤트 Morning_Door가 Morning_Choice를 연다
+@label Morning_Room
+@SetObjective Obj_RoomDoor 방문으로_나가기
+지갑에 든 돈으로는 이번 달 방값의 절반도 안 된다.
+@end
 
 @label Morning_Choice
-지갑에 든 돈으로는 이번 달 방값의 절반도 안 된다.
+@ClearObjective
+어디로 갈까.
 @menu
 - 도서관에 간다 -> GoLibrary
 @AddCounter Study 1
 - 알바하러 간다 -> WorkMenu
+- 조금 더 있다 나가자 -> Morning_Stay
 
 @label WorkMenu
-어디로 갈까.
+어느 알바로 갈까.
 @menu
 - 햄버거집 -> GoBurger
 - 꽃집 -> GoFlower
 - 편의점 -> GoStore
-- 그만둔다 -> Morning_Choice
+- 그만둔다 -> Morning_Stay
+
+@label Morning_Stay
+@SetObjective Obj_RoomDoor 방문으로_나가기
+아직은 방에 있기로 했다.
+@end
 
 @label GoLibrary
 @FadeOut Black 10

@@ -47,6 +47,10 @@ bool AInteractableProp::CanInteract_Implementation(AActor* Interactor) const
 			{
 				return false;
 			}
+			if (bOnlyWhenEventAvailable && !DialogueNodeId.IsNone())
+			{
+				return Dialogue->HasStartableEvent(ConnectedEventTable, DialogueNodeId);
+			}
 		}
 	}
 

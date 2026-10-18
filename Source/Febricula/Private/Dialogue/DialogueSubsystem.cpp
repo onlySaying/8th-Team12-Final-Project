@@ -204,6 +204,33 @@ void UDialogueSubsystem::SetDataTables(UDataTable* InEventTable, UDataTable* InD
 
 
 // [skydodo] 2026-10-13 버그 수정: DialogueNodeId로 고른 경우 BestRowName이 비어 이벤트 완료 기록이 빠졌다. Row가 null이면 역참조하던 것도 막음
+bool UDialogueSubsystem::HasStartableEvent(const UDataTable* Table, FName RootNodeId) const
+{
+	const UGameProgressSubsystem* Progress = GetProgress();
+	if (!Table || !Progress || RootNodeId.IsNone())
+	{
+		return false;
+	}
+
+	for (const TPair<FName, uint8*>& Pair : Table->GetRowMap())
+	{
+		const FNpcEventRow* Row = reinterpret_cast<const FNpcEventRow*>(Pair.Value);
+		if (!Row || Row->RootNodeId != RootNodeId)
+		{
+			continue;
+		}
+		if (!Row->bRepeatable && Progress->IsEventCompleted(Pair.Key))
+		{
+			continue;
+		}
+		if (Progress->EvaluateConditions(Row->Preconditions))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool UDialogueSubsystem::TryStartEventForNpc(FName NpcId, AActor* InInstigator, FName DialogueNodeId)
 {
  	if (bDialogueActive || !EventTable)

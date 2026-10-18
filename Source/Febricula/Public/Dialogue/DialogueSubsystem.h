@@ -82,6 +82,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 	bool TryStartEventForNpc(FName NpcId, AActor* InInstigator, FName DialogueNodeId = NAME_None);
 
+	/**
+	 * [skydodo] 2026-10-18 추가: Table에 RootNodeId로 시작하는 이벤트 중 지금 조건을 만족하는 게 있는지.
+	 * 사물이 "지금 누를 수 있을 때만" 상호작용 문구를 띄우는 데 쓴다 (시작 조건은 TryStartEventForNpc와 같다)
+	 */
+	bool HasStartableEvent(const UDataTable* Table, FName RootNodeId) const;
+
 	/** 특정 노드부터 직접 대화를 시작한다 (이벤트 테이블을 거치지 않는 경우) */
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 	bool StartDialogueAtNode(FName NodeId, AActor* InInstigator);
