@@ -14,6 +14,8 @@
 | [1:02](https://youtu.be/h2udxPp443g?t=62) | 아침 선택 — 도서관 / 알바 미니게임 (햄버거집 · 꽃집 · 편의점) |
 | [1:36](https://youtu.be/h2udxPp443g?t=96) · [2:19](https://youtu.be/h2udxPp443g?t=139) · [3:03](https://youtu.be/h2udxPp443g?t=183) | 엔딩 A · B · C |
 
+**[▶ 전체 플레이 영상 (4분 56초)](https://youtu.be/fFEQA85WPqc)** — 타이틀부터 엔딩까지 끊지 않고 직접 플레이 (알바 2번 → 편의점 · 햄버거집 미니게임 → 엔딩 B)
+
 ## ⬇ 다운로드
 
 **[⬇ 실행 파일 다운로드 (Windows, zip 933MB)](https://drive.google.com/file/d/1aP1OcL8d3HDHQjEuPE8-4bjrkX2OfJ7O/view?usp=sharing)** — 압축을 풀고 `Febricula/Febricula.exe` 실행
