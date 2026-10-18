@@ -3,8 +3,14 @@
     "Name": "D1_Room",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "고시원 3층 7호실. 창문 없는 방이 한 달에 삼십오만 원.",
+    "Text": "",
     "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "1일차",
+        "Key2": "검정고시까지_나흘",
+        "Value": 2
+      },
       {
         "Type": "FadeIn",
         "Key": "None",
@@ -15,11 +21,11 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_001",
-    "AutoAdvance": "None",
-    "AutoAdvanceValue": 0.0,
+    "NextNodeId": "D1_Room_card",
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 2.6,
     "AutoAdvanceNpcId": "None",
-    "bHideBoxWhileWaiting": false,
+    "bHideBoxWhileWaiting": true,
     "Camera": {
       "CameraType": "None",
       "Location": {
@@ -43,15 +49,15 @@
     }
   },
   {
-    "Name": "D1_Room_001",
+    "Name": "D1_Room_card",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "검정고시까지 나흘.",
+    "Text": "고시원 3층 7호실. 창문 없는 방이 한 달에 삼십오만 원.",
     "OnEnterActions": [],
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_002",
+    "NextNodeId": "D1_Room_card_001",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -79,7 +85,7 @@
     }
   },
   {
-    "Name": "D1_Room_002",
+    "Name": "D1_Room_card_001",
     "SpeakerName": "삼촌",
     "SpeakerNpcId": "NPC_Uncle",
     "Text": "천율아. 살아 있냐.",
@@ -94,7 +100,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_003",
+    "NextNodeId": "D1_Room_card_002",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -122,7 +128,7 @@
     }
   },
   {
-    "Name": "D1_Room_003",
+    "Name": "D1_Room_card_002",
     "SpeakerName": "강천율",
     "SpeakerNpcId": "PC_GangChunyul",
     "Text": "네.",
@@ -130,7 +136,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_004",
+    "NextNodeId": "D1_Room_card_003",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -158,7 +164,7 @@
     }
   },
   {
-    "Name": "D1_Room_004",
+    "Name": "D1_Room_card_003",
     "SpeakerName": "삼촌",
     "SpeakerNpcId": "NPC_Uncle",
     "Text": "도서관 아홉 시에 연다. 늦으면 자리 없다.",
@@ -166,7 +172,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_005",
+    "NextNodeId": "D1_Room_card_004",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -194,7 +200,7 @@
     }
   },
   {
-    "Name": "D1_Room_005",
+    "Name": "D1_Room_card_004",
     "SpeakerName": "강천율",
     "SpeakerNpcId": "PC_GangChunyul",
     "Text": "지금 나가요.",
@@ -202,7 +208,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D1_Room_006",
+    "NextNodeId": "D1_Room_card_005",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -230,7 +236,7 @@
     }
   },
   {
-    "Name": "D1_Room_006",
+    "Name": "D1_Room_card_005",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
     "Text": "",
@@ -2215,16 +2221,23 @@
     "Name": "Morning_D2",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "시험까지 사흘.",
-    "OnEnterActions": [],
+    "Text": "",
+    "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "2일차",
+        "Key2": "시험까지_사흘",
+        "Value": 2
+      }
+    ],
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
     "NextNodeId": "Morning_Choice",
-    "AutoAdvance": "None",
-    "AutoAdvanceValue": 0.0,
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 2.6,
     "AutoAdvanceNpcId": "None",
-    "bHideBoxWhileWaiting": false,
+    "bHideBoxWhileWaiting": true,
     "Camera": {
       "CameraType": "None",
       "Location": {
@@ -2251,16 +2264,23 @@
     "Name": "Morning_D3",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "시험까지 이틀.",
-    "OnEnterActions": [],
+    "Text": "",
+    "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "3일차",
+        "Key2": "시험까지_이틀",
+        "Value": 2
+      }
+    ],
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
     "NextNodeId": "Morning_Choice",
-    "AutoAdvance": "None",
-    "AutoAdvanceValue": 0.0,
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 2.6,
     "AutoAdvanceNpcId": "None",
-    "bHideBoxWhileWaiting": false,
+    "bHideBoxWhileWaiting": true,
     "Camera": {
       "CameraType": "None",
       "Location": {
@@ -3690,10 +3710,16 @@
   },
   {
     "Name": "D4_Room",
-    "SpeakerName": "삼촌",
-    "SpeakerNpcId": "NPC_Uncle",
-    "Text": "수험표.",
+    "SpeakerName": "",
+    "SpeakerNpcId": "None",
+    "Text": "",
     "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "4일차",
+        "Key2": "시험_날",
+        "Value": 2
+      },
       {
         "Type": "FadeIn",
         "Key": "None",
@@ -3704,7 +3730,43 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_001",
+    "NextNodeId": "D4_Room_card",
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 2.6,
+    "AutoAdvanceNpcId": "None",
+    "bHideBoxWhileWaiting": true,
+    "Camera": {
+      "CameraType": "None",
+      "Location": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "Rotation": {
+        "Roll": 0.0,
+        "Pitch": 0.0,
+        "Yaw": 0.0
+      },
+      "MoveTime": 0.0,
+      "Focus": 100000.0
+    },
+    "SoundLocation": {
+      "SoundChannel": "",
+      "SoundName": "",
+      "Target": "",
+      "Blend": 0.0
+    }
+  },
+  {
+    "Name": "D4_Room_card",
+    "SpeakerName": "삼촌",
+    "SpeakerNpcId": "NPC_Uncle",
+    "Text": "수험표.",
+    "OnEnterActions": [],
+    "Choices": [],
+    "bYesNo": false,
+    "Branches": [],
+    "NextNodeId": "D4_Room_card_001",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3732,7 +3794,7 @@
     }
   },
   {
-    "Name": "D4_Room_001",
+    "Name": "D4_Room_card_001",
     "SpeakerName": "강천율",
     "SpeakerNpcId": "PC_GangChunyul",
     "Text": "챙겼어요.",
@@ -3740,7 +3802,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_002",
+    "NextNodeId": "D4_Room_card_002",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3768,7 +3830,7 @@
     }
   },
   {
-    "Name": "D4_Room_002",
+    "Name": "D4_Room_card_002",
     "SpeakerName": "삼촌",
     "SpeakerNpcId": "NPC_Uncle",
     "Text": "신분증.",
@@ -3776,7 +3838,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_003",
+    "NextNodeId": "D4_Room_card_003",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3804,7 +3866,7 @@
     }
   },
   {
-    "Name": "D4_Room_003",
+    "Name": "D4_Room_card_003",
     "SpeakerName": "강천율",
     "SpeakerNpcId": "PC_GangChunyul",
     "Text": "챙겼어요.",
@@ -3812,7 +3874,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_004",
+    "NextNodeId": "D4_Room_card_004",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3840,7 +3902,7 @@
     }
   },
   {
-    "Name": "D4_Room_004",
+    "Name": "D4_Room_card_004",
     "SpeakerName": "삼촌",
     "SpeakerNpcId": "NPC_Uncle",
     "Text": "…밥은.",
@@ -3848,7 +3910,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_005",
+    "NextNodeId": "D4_Room_card_005",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3876,7 +3938,7 @@
     }
   },
   {
-    "Name": "D4_Room_005",
+    "Name": "D4_Room_card_005",
     "SpeakerName": "강천율",
     "SpeakerNpcId": "PC_GangChunyul",
     "Text": "다녀와서요.",
@@ -3884,7 +3946,7 @@
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "D4_Room_006",
+    "NextNodeId": "D4_Room_card_006",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -3912,7 +3974,7 @@
     }
   },
   {
-    "Name": "D4_Room_006",
+    "Name": "D4_Room_card_006",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
     "Text": "",
@@ -4520,6 +4582,12 @@
     "SpeakerNpcId": "None",
     "Text": "관리실 창문 너머로 텔레비전 소리가 났다.",
     "OnEnterActions": [
+      {
+        "Type": "Teleport",
+        "Key": "Player",
+        "Key2": "Story_HallEnding",
+        "Value": 0
+      },
       {
         "Type": "FadeIn",
         "Key": "None",
@@ -5655,19 +5723,33 @@
     "Name": "Ending_Title_w1",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
-    "Text": "「미열」 — 끝",
-    "OnEnterActions": [
-      {
-        "Type": "FadeIn",
-        "Key": "None",
-        "Key2": "None",
-        "Value": 1
-      }
-    ],
+    "Text": "",
+    "OnEnterActions": [],
     "Choices": [],
     "bYesNo": false,
-    "Branches": [],
-    "NextNodeId": "Ending_Title_w1_001",
+    "Branches": [
+      {
+        "Conditions": [
+          {
+            "Type": "CounterAtLeast",
+            "Key": "Study",
+            "Value": 2
+          }
+        ],
+        "NextNodeId": "Ending_Card_A"
+      },
+      {
+        "Conditions": [
+          {
+            "Type": "CounterAtMost",
+            "Key": "Study",
+            "Value": 0
+          }
+        ],
+        "NextNodeId": "Ending_Card_B"
+      }
+    ],
+    "NextNodeId": "Ending_Card_C",
     "AutoAdvance": "None",
     "AutoAdvanceValue": 0.0,
     "AutoAdvanceNpcId": "None",
@@ -5695,24 +5777,24 @@
     }
   },
   {
-    "Name": "Ending_Title_w1_001",
+    "Name": "Ending_Card_A",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
     "Text": "",
     "OnEnterActions": [
       {
-        "Type": "FadeOut",
-        "Key": "Black",
-        "Key2": "None",
-        "Value": 10
+        "Type": "ShowTitleCard",
+        "Key": "엔딩_A",
+        "Key2": "냉장고의_채점표",
+        "Value": 3
       }
     ],
     "Choices": [],
     "bYesNo": false,
     "Branches": [],
-    "NextNodeId": "Ending_Title_w2",
+    "NextNodeId": "Ending_Close",
     "AutoAdvance": "AfterDelay",
-    "AutoAdvanceValue": 1.2,
+    "AutoAdvanceValue": 4.2,
     "AutoAdvanceNpcId": "None",
     "bHideBoxWhileWaiting": true,
     "Camera": {
@@ -5738,7 +5820,93 @@
     }
   },
   {
-    "Name": "Ending_Title_w2",
+    "Name": "Ending_Card_B",
+    "SpeakerName": "",
+    "SpeakerNpcId": "None",
+    "Text": "",
+    "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "엔딩_B",
+        "Key2": "서랍_속_통장",
+        "Value": 3
+      }
+    ],
+    "Choices": [],
+    "bYesNo": false,
+    "Branches": [],
+    "NextNodeId": "Ending_Close",
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 4.2,
+    "AutoAdvanceNpcId": "None",
+    "bHideBoxWhileWaiting": true,
+    "Camera": {
+      "CameraType": "None",
+      "Location": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "Rotation": {
+        "Roll": 0.0,
+        "Pitch": 0.0,
+        "Yaw": 0.0
+      },
+      "MoveTime": 0.0,
+      "Focus": 100000.0
+    },
+    "SoundLocation": {
+      "SoundChannel": "",
+      "SoundName": "",
+      "Target": "",
+      "Blend": 0.0
+    }
+  },
+  {
+    "Name": "Ending_Card_C",
+    "SpeakerName": "",
+    "SpeakerNpcId": "None",
+    "Text": "",
+    "OnEnterActions": [
+      {
+        "Type": "ShowTitleCard",
+        "Key": "엔딩_C",
+        "Key2": "둘_다_반",
+        "Value": 3
+      }
+    ],
+    "Choices": [],
+    "bYesNo": false,
+    "Branches": [],
+    "NextNodeId": "Ending_Close",
+    "AutoAdvance": "AfterDelay",
+    "AutoAdvanceValue": 4.2,
+    "AutoAdvanceNpcId": "None",
+    "bHideBoxWhileWaiting": true,
+    "Camera": {
+      "CameraType": "None",
+      "Location": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "Rotation": {
+        "Roll": 0.0,
+        "Pitch": 0.0,
+        "Yaw": 0.0
+      },
+      "MoveTime": 0.0,
+      "Focus": 100000.0
+    },
+    "SoundLocation": {
+      "SoundChannel": "",
+      "SoundName": "",
+      "Target": "",
+      "Blend": 0.0
+    }
+  },
+  {
+    "Name": "Ending_Close",
     "SpeakerName": "",
     "SpeakerNpcId": "None",
     "Text": "",

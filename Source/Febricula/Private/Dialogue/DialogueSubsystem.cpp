@@ -35,6 +35,7 @@
 #include "Dialogue/DialogueLogSubsystem.h"
 #include "Objective/ObjectiveSubsystem.h"
 #include "MiniGame/MiniGameSubsystem.h"
+#include "UI/TitleCardWidget.h"
 
 TStatId UDialogueSubsystem::GetStatId() const
 {
@@ -1434,6 +1435,13 @@ void UDialogueSubsystem::ExecuteAction(const FGameAction& Action)
 						if (Found.Num() > 0)
 						{
 							NowActor->SetActorLocationAndRotation(Found[0]->GetActorLocation(), Found[0]->GetActorRotation());
+
+							// [skydodo] 2026-10-18 추가: 플레이어는 카메라(컨트롤 회전)도 도착 방향으로 돌린다.
+							// 안 돌리면 이전 방향을 보던 카메라가 벽에 막혀 등 뒤에 바짝 붙는다
+							if (AController* Controller = NowCharacter->GetController(); Controller && Controller->IsPlayerController())
+							{
+								Controller->SetControlRotation(Found[0]->GetActorRotation());
+							}
 						}
 					}
 				}
@@ -1564,6 +1572,22 @@ void UDialogueSubsystem::ExecuteAction(const FGameAction& Action)
 		if (UMiniGameSubsystem* MiniGame = GetWorld()->GetSubsystem<UMiniGameSubsystem>())
 		{
 			MiniGame->StartHere(Action.Key);
+		}
+		break;
+
+	case EGameActionType::ShowTitleCard:
+		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		{
+			auto ToText = [](FName Name)
+			{
+				return Name.IsNone() ? FText::GetEmpty() : FText::FromString(Name.ToString().Replace(TEXT("_"), TEXT(" ")));
+			};
+			if (UTitleCardWidget* Card = CreateWidget<UTitleCardWidget>(PC, UTitleCardWidget::StaticClass()))
+			{
+				Card->Show(ToText(Action.Key), ToText(Action.Key2), Action.Value > 0 ? static_cast<float>(Action.Value) : 2.f);
+				// 대화창(위젯)보다 위, 미니게임 색지보다도 위
+				Card->AddToViewport(100);
+			}
 		}
 		break;
 		

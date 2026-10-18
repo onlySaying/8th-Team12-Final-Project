@@ -12,9 +12,12 @@
 // ===========================================================================
 
 @label D1_Room
+@ShowTitleCard 1일차 검정고시까지_나흘 2
 @FadeIn 1
+@wait 2.6
+@hide
+@label D1_Room_card
 고시원 3층 7호실. 창문 없는 방이 한 달에 삼십오만 원.
-검정고시까지 나흘.
 @PlaySE First bell
 삼촌: 천율아. 살아 있냐.
 천율: 네.
@@ -176,11 +179,15 @@
 @jump Morning_D2
 
 @label Morning_D2
-시험까지 사흘.
+@ShowTitleCard 2일차 시험까지_사흘 2
+@wait 2.6
+@hide
 @jump Morning_Choice
 
 @label Morning_D3
-시험까지 이틀.
+@ShowTitleCard 3일차 시험까지_이틀 2
+@wait 2.6
+@hide
 @jump Morning_Choice
 
 @label Morning_Choice
@@ -323,7 +330,11 @@
 // ===========================================================================
 
 @label D4_Room
+@ShowTitleCard 4일차 시험_날 2
 @FadeIn 1
+@wait 2.6
+@hide
+@label D4_Room_card
 삼촌: 수험표.
 천율: 챙겼어요.
 삼촌: 신분증.
@@ -403,6 +414,7 @@
 // ===========================================================================
 
 @label Ending
+@Teleport Player Story_HallEnding
 @FadeIn 1
 관리실 창문 너머로 텔레비전 소리가 났다.
 @if CounterAtLeast Study 2
@@ -467,12 +479,32 @@
 @wait 2.5
 @hide
 @label Ending_Title_w1
-@FadeIn 1
-「미열」 — 끝
-@FadeOut Black 10
-@wait 1.2
+@if CounterAtLeast Study 2
+@branch Ending_Card_A
+@if CounterAtMost Study 0
+@branch Ending_Card_B
+@jump Ending_Card_C
+
+// 엔딩 이름 카드 - 검은 화면 위에 띄우고 타이틀로
+@label Ending_Card_A
+@ShowTitleCard 엔딩_A 냉장고의_채점표 3
+@wait 4.2
 @hide
-@label Ending_Title_w2
+@jump Ending_Close
+
+@label Ending_Card_B
+@ShowTitleCard 엔딩_B 서랍_속_통장 3
+@wait 4.2
+@hide
+@jump Ending_Close
+
+@label Ending_Card_C
+@ShowTitleCard 엔딩_C 둘_다_반 3
+@wait 4.2
+@hide
+@jump Ending_Close
+
+@label Ending_Close
 @ChangeLevel Title
 @wait 0.1
 @hide

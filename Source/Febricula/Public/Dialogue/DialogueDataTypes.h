@@ -284,7 +284,13 @@ enum class EGameActionType : uint8
 	ClearObjective			UMETA(DisplayName = "목표 지우기"),
 
 	/** Key(MiniGame Setting의 키, 예: Burger) 미니게임을 레벨 이동 없이 지금 레벨에서 띄운다 */
-	StartMiniGame			UMETA(DisplayName = "미니게임 시작")
+	StartMiniGame			UMETA(DisplayName = "미니게임 시작"),
+
+	/**
+	 * 화면 전체를 덮는 검은 카드에 Key(큰 제목)와 Key2(부제)를 띄운다. Value = 보여 줄 초 (0이면 2초).
+	 * Key/Key2의 '_'는 공백으로 바꿔 보여 준다 (시험까지_사흘)
+	 */
+	ShowTitleCard			UMETA(DisplayName = "타이틀 카드")
 };
 
 /**

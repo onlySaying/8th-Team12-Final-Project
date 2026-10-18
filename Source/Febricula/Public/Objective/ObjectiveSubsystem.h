@@ -24,6 +24,9 @@ public:
 
 	void ClearObjective();
 
+	/** 지금 목표 대상 (없으면 nullptr). 자동 플레이가 걸어갈 곳을 정할 때 쓴다 */
+	AActor* GetTargetActor() { return TargetId.IsNone() ? nullptr : ResolveTarget(); }
+
 	//~ Begin UTickableWorldSubsystem
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
