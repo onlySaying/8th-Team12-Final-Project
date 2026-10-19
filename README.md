@@ -92,6 +92,21 @@
 - **여러 NPC 동시 등장** — 참가자 전원 순찰 중지 → 대화 후 한꺼번에 해제
 - **자리별 대화** — 같은 NPC라도 만난 장소와 진행 상황에 따라 다른 대사 (예: 서윤은 도서관 첫 방문과 두 번째 방문에서 다른 대화)
 
+**데이터 테이블 두 장으로 관리** — 이벤트와 대사를 코드에 넣지 않고 테이블 행으로 씁니다.
+
+이벤트 테이블 (`DT_MainStroyEvent`) — 시작 조건 · 우선순위
+
+![이벤트 데이터 테이블](Docs/images/datatable_event.png)
+
+↓ `Root Node Id`가 대화 노드 테이블의 행 이름을 가리킴
+
+대화 노드 테이블 (`DT_StoryDialogue`) — 화자 · 대사 · 진입 시 액션
+
+![대화 노드 데이터 테이블](Docs/images/datatable_dialogue.png)
+
+- 조건 28종 · 액션 47종 — 타이틀 카드 · 레벨 이동 · 호감도 변경도 액션 데이터로 처리
+- 대화 · NPC 배치 · 상호작용 소품이 같은 조건 평가를 공유 → 새 규칙은 종류 하나만 추가하면 모든 시스템에서 사용
+
 ```cpp
 // 조건을 만족하는 이벤트 중 Priority가 가장 높은 것
 for (const auto& Pair : EventTable->GetRowMap())
@@ -193,6 +208,14 @@ EnterTalkForParticipants(Participants, InInstigator);
 **순찰 · 안내 Behavior Tree** — Chase / Guide(`WaitForPlayerNearby`) / Patrol(`AdvanceRouteTarget`) / Idle. 상태 전환은 이벤트 액션(`NpcStartPatrol` / `NpcStartGuide`)이 호출해 스토리 연출이 AI를 제어합니다.
 
 **트러블슈팅 — 날이 바뀔 때 NPC가 깜빡이거나 밀려남**
+
+| | ① 날짜 전환 전 | ② 전환 중 | ③ 날짜 전환 후 |
+|---|---|---|---|
+| **변경 전** | ![변경 전 1](Docs/images/spawner_before_1.jpg) | ![변경 전 2: 깜빡임](Docs/images/spawner_before_2.jpg) | ![변경 전 3: 겹침](Docs/images/spawner_before_3.jpg) |
+| **변경 후** | ![변경 후 1](Docs/images/spawner_after_1.jpg) | ![변경 후 2: 유지](Docs/images/spawner_after_2.jpg) | ![변경 후 3: 각자 새 자리](Docs/images/spawner_after_3.jpg) |
+
+<sub>변경 전 장면은 문제 상황을 에디터에서 재연한 것입니다.</sub>
+
 - 원인: ① 행이 바뀌면 무조건 내리고 다시 세움 ② 내리기와 세우기를 NPC별로 번갈아 처리해, 앞 NPC가 자리를 비우기 전에 다음 NPC가 생김
 - 해결: ① 자리 · 애니메이션 · AIState · 경로 · 대화가 같으면 그대로 둠(`IsSamePlacement`) ② 전부 내린 뒤에 세우는 두 단계로 분리
 
